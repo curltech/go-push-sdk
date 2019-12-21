@@ -1,0 +1,47 @@
+{
+  "huawei": {
+    "appPkgName": "应用包名",
+    "clientId": "用户在联盟申请的APPID",
+    "clientSecret": "应用ID对应的秘钥"
+  },
+  "meizu": {
+    "appPkgName": "应用包名",
+    "appId": "应用ID",
+    "appSecret": "应用秘钥"
+  },
+  "xiaomi": {
+    "appPkgName": "应用包名",
+    "appSecret": "应用秘钥"
+  },
+  "oppo": {
+    "appPkgName": "应用包名",
+    "appKey": "应用key",
+    "masterSecret": "主秘钥"
+  },
+  "vivo": {
+    "appPkgName": "应用包名",
+    "appId": "应用ID",
+    "appKey": "应用key",
+    "appSecret": "应用秘钥"
+  },
+  "ios": {
+    "isSandBox": true,
+    "isSandBoxComment": "是否沙盒环境（非正式环境）",
+    "certPath": "",
+    "certPathComment": "pem格式推送证书绝对路径",
+    "password": "",
+    "passwordComment": "推送证书密码"
+  },
+  "ios-token": {
+    "isSandBox": true,
+    "isSandBoxComment": "是否沙盒环境（非正式环境）",
+    "teamId": "xxxxx",
+    "teamIdComment": "开发者帐号teamId",
+    "keyId": "xxxxx",
+    "keyIdComment": "token认证keyId",
+    "secretFile": "xxx.p8",
+    "secretFileComment": "token认证密钥文件本地绝对路径",
+    "bundleId": "com.xxx.xxx",
+    "bundleIdComment": "应用ID"
+  }
+}
