@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	
+
 	"gitee.com/cristiane/go-push-sdk/push/common/http"
 	"gitee.com/cristiane/go-push-sdk/push/errcode"
 )
@@ -27,21 +27,20 @@ func NewAccessToken() *AccessToken {
 }
 
 func (a *AccessToken) buildRequest(request *AccessTokenReq) map[string]string {
-	params := map[string]string{
+
+	return map[string]string{
 		"grant_type":    request.GrantType,
 		"client_id":     request.ClientId,
 		"client_secret": request.ClientSecret,
 		"scope":         request.Scope,
 	}
-	
-	return params
 }
 
 func (a *AccessToken) parseBody(body []byte) (*AccessTokenResp, error) {
 	resp := &AccessTokenResp{}
 	err := json.Unmarshal(body, resp)
 	if err != nil {
-		log.Printf("parseBody err: %v", err)
+		log.Printf("[go-push-sdk] huawei access token  parseBody err: %v", err)
 		return nil, errcode.ErrParseBody
 	}
 	return resp, nil
@@ -54,20 +53,20 @@ func (a *AccessToken) checkRequest(request *AccessTokenReq) error {
 	if request.ClientSecret == "" {
 		return errcode.ErrClientSecretEmpty
 	}
-	request.GrantType = grantTypeDefault
-	
+
 	return nil
 }
 
-func (a *AccessToken) Get(ctx context.Context,request *AccessTokenReq) (*AccessTokenResp, error) {
+func (a *AccessToken) Get(ctx context.Context, request *AccessTokenReq) (*AccessTokenResp, error) {
 	errCheck := a.checkRequest(request)
+	request.GrantType = grantTypeDefault
+
 	if errCheck != nil {
 		return nil, errCheck
 	}
-	body, err := a.httpClient.PostForm(ctx,urlAccessToken, a.buildRequest(request))
+	body, err := a.httpClient.PostForm(ctx, urlAccessToken, a.buildRequest(request))
 	if err != nil {
 		return nil, err
 	}
 	return a.parseBody(body)
 }
-

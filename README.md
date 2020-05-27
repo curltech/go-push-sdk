@@ -1,16 +1,9 @@
-# go-push-sdk
+# go-push-sdk 《手机消息推送SDK》   
+封装五大安卓厂商，iOS平台PUSH API构建手机消息推送SDK，目的在于减少造轮子，欢迎各位gopher使用&fix   
+目前支持的手机厂商   
+安卓：华为，小米，OPPO，vivo，魅族   
+IOS：支持两种推送模式   
 
-## 版本说明
-当前版本：v3   
-
-| 版本号 | 修改人 | 修改日期 | 描述 |
-| :-----| ----: | :----: | :----: |
-| v2 | 杨强 | 2019/7/15 | 支持华为，小米，魅族，OPPO，vivo，iOS（cert模式和token模式）厂商消息推送 |
-| v3 | 杨强 | 2019/8/5 | 获取授权token，推送消息增加上下文参数（为接入打点提供支持） |
-| v3.1 | 杨强 | 2019/11/28 | 结构优化，更新引用三方包apns2 |
-
-  
-  
 ## 环境要求
 + go > 1.7
 
@@ -20,7 +13,7 @@
 2. 参考根目录sample.go示例代码进行消息推送   
    2.1  初始化一个推送平台注册器   
 ```
-	register, err := push.NewRegisterClient()
+	register, err := push.NewRegisterClient(push.DefaultConfFile)
 	if err != nil {
 		fmt.Printf("NewRegisterClient err: %v", err)
 		return
@@ -67,17 +60,15 @@
 	}
 	fmt.Printf("ios push resp: %+v", respPush)
 ```
-## 使用方式二   
-使用详情参照v1版本-使用方式二 
 
 
 ## HTTP测试接口
 支持平台：华为，小米，OPPO，vivo，魅族，iPhone   
 本机需要配置host   
-10.5.24.47  go-push.xxx.com   
+localhost  go-push-sdk.com   
 + 华为手机
    + 需要先获取access_token   
-URL：http://go-push.xxx.com:9090/go-push/huawei/push/access_token   
+URL：http://go-push-sdk.com/huawei/access_token   
 请求方式：get   
 body: 无   
 响应结果：   
@@ -92,7 +83,7 @@ body: 无
 }
 ```
    + 消息推送   
-URL：http://go-push.xxx.com:9090/go-push/huawei/push   
+URL：http://go-push-sdk.com/huawei/push   
 请求方式：post表单   
 消息参数如下：   
 
@@ -121,7 +112,7 @@ URL：http://go-push.xxx.com:9090/go-push/huawei/push
 + 魅族手机   
 + 不需要授权token   
 + 消息推送   
-URL：http://go-push.xxx.com:9090/go-push/meizu/push   
+URL：http://go-push-sdk.com/meizu/push   
 请求方式：post表单   
 消息参数如下：
 
@@ -155,7 +146,7 @@ URL：http://go-push.xxx.com:9090/go-push/meizu/push
 + 小米手机   
 + 不需要授权token   
 + 消息推送   
-URL：http://go-push.xxx.com:9090/go-push/xiaomi/push   
+URL：http://go-push-sdk.com/xiaomi/push   
 请求方式：post表单   
 消息参数如下：
 
@@ -187,7 +178,7 @@ URL：http://go-push.xxx.com:9090/go-push/xiaomi/push
 
 + oppo手机   
 + 获取auth_token   
-URL：http://go-push.xxx.com:9090/go-push/oppo/push/auth_token   
+URL：http://go-push-sdk.com/oppo/auth_token   
 请求方式：get   
 body: 无   
 返回：   
@@ -200,7 +191,7 @@ body: 无
 }
 ```
 + 消息推送   
-URL：http://go-push.xxx.com:9090/go-push/oppo/push   
+URL：http://go-push-sdk.com/oppo/push   
 请求方式：post表单   
 消息参数如下：
 
@@ -228,7 +219,7 @@ URL：http://go-push.xxx.com:9090/go-push/oppo/push
 
 + vivo手机   
 + 获取auth_token   
-URL：http://go-push.xxx.com:9090/go-push/vivo/push/auth_token   
+URL：http://go-push-sdk.com/vivo/auth_token   
 请求方式：get   
 body: 无   
 返回：   
@@ -241,7 +232,7 @@ body: 无
 }
 ```
 + 消息推送
-URL：http://go-push.xxx.com:9090/go-push/vivo/push   
+URL：http://go-push-sdk.com/vivo/push   
 请求方式：post表单   
 消息参数如下：
 
@@ -267,8 +258,8 @@ URL：http://go-push.xxx.com:9090/go-push/vivo/push
   "task_id": ""
 }
 ```   
-+ iphone（基于证书）
-URL：http://go-push.xxx.com:9090/go-push/iphone/push/cert   
++ ios（基于证书）
+URL：http://go-push-sdk.com/ios/cert-push   
 请求方式：post表单   
 消息参数如下：
 
@@ -293,8 +284,8 @@ URL：http://go-push.xxx.com:9090/go-push/iphone/push/cert
   "success": true
 }
 ```   
-+ iPhone（基于token）   
-URL：http://go-push.xxx.com:9090/go-push/iphone/push/token   
++ ios（基于token）   
+URL：http://go-push-sdk.com/ios/token-push   
 请求方式：post表单   
 消息参数如下：
 

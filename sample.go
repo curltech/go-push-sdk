@@ -3,13 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
+
 	"gitee.com/cristiane/go-push-sdk/push"
 	"gitee.com/cristiane/go-push-sdk/push/setting"
+	"github.com/google/uuid"
 )
 
 func main() {
-	register, err := push.NewRegisterClient()
+	register, err := push.NewRegisterClientWithConf("...json conf data...")
 	if err != nil {
 		fmt.Printf("NewRegisterClient err: %v", err)
 		return
@@ -20,7 +21,7 @@ func main() {
 		return
 	}
 	var deviceTokens = []string{
-		"c79784384b65f2464249ce2bc22c6896975b9becb124976d4bce5b3760cf96ac",
+		"xxxxxxxxxxxxxxxx",
 	}
 	msg := &setting.PushMessageRequest{
 		AccessToken:  "",
@@ -47,4 +48,3 @@ func main() {
 	}
 	fmt.Printf("ios push resp: %+v", respPush)
 }
-

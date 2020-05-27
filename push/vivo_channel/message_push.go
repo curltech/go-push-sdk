@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	
+
 	"gitee.com/cristiane/go-push-sdk/push/common/http"
 	"gitee.com/cristiane/go-push-sdk/push/common/intent"
 	"gitee.com/cristiane/go-push-sdk/push/common/json"
@@ -26,10 +26,11 @@ const (
 
 type PushClient struct {
 	httpClient *http.Client
-	conf       *setting.PlatformVIVO
+	conf       *setting.VIVO
+	authClient *AuthToken
 }
 
-func NewPushClient(conf *setting.PlatformVIVO) (*PushClient, error) {
+func NewPushClient(conf *setting.VIVO) (*PushClient, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -37,10 +38,11 @@ func NewPushClient(conf *setting.PlatformVIVO) (*PushClient, error) {
 	return &PushClient{
 		conf:       conf,
 		httpClient: http.NewClient(timeout),
+		authClient: NewAuthToken(),
 	}, nil
 }
 
-func checkConf(conf *setting.PlatformVIVO) error {
+func checkConf(conf *setting.VIVO) error {
 	if conf.AppPkgName == "" {
 		return errcode.ErrAppPkgNameEmpty
 	}
@@ -53,7 +55,7 @@ func checkConf(conf *setting.PlatformVIVO) error {
 	if conf.AppSecret == "" {
 		return errcode.ErrAppSecretEmpty
 	}
-	
+
 	return nil
 }
 
@@ -62,7 +64,7 @@ func (p *PushClient) PushNotice(ctx context.Context, pushRequest *setting.PushMe
 	if errCheck != nil {
 		return nil, errCheck
 	}
-	
+
 	return p.pushNotice(ctx, pushRequest)
 }
 
@@ -70,25 +72,25 @@ func (p *PushClient) parseBody(body []byte) (*PushMessageResponse, error) {
 	resp := &PushMessageResponse{}
 	err := json.UnmarshalByte(body, resp)
 	if err != nil {
-		log.Printf("vivo parseBody err: %v", err)
+		log.Printf("[go-push-sdk] vivo message push parseBody err: %v", err)
 		return nil, errcode.ErrParseBody
 	}
 	return resp, nil
 }
 
 func (p *PushClient) GetAccessToken(ctx context.Context) (*AuthTokenResp, error) {
-	authToken := NewAuthToken()
+
 	authTokenReq := &AuthTokenReq{
 		AppId:     p.conf.AppId,
 		AppKey:    p.conf.AppKey,
 		AppSecret: p.conf.AppSecret,
 	}
-	
-	return authToken.Get(ctx, authTokenReq)
+
+	return p.authClient.Get(ctx, authTokenReq)
 }
 
 func (p *PushClient) checkParam(pushRequest *setting.PushMessageRequest) error {
-	
+
 	err := message.CheckMessageParam(pushRequest, deviceTokenMin, deviceTokenMax, true)
 	if err != nil {
 		return err
@@ -96,17 +98,17 @@ func (p *PushClient) checkParam(pushRequest *setting.PushMessageRequest) error {
 	if pushRequest.Message.BusinessId == "" {
 		return errcode.ErrBusinessIdEmpty
 	}
-	
+
 	return nil
 }
 
 func (p *PushClient) pushNotice(ctx context.Context, pushRequest *setting.PushMessageRequest) (*PushMessageResponse, error) {
-	
+
 	body, err := p.pushGateWay(ctx, pushRequest)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return p.parseBody(body)
 }
 
@@ -119,7 +121,7 @@ func (p *PushClient) pushGateWay(ctx context.Context, pushRequest *setting.PushM
 }
 
 func (p *PushClient) pushMultiNotify(ctx context.Context, pushRequest *setting.PushMessageRequest) ([]byte, error) {
-	
+
 	saveMessageTaskId, err := p.saveMessageToCloud(ctx, pushRequest)
 	if err != nil {
 		return nil, err
@@ -130,7 +132,7 @@ func (p *PushClient) pushMultiNotify(ctx context.Context, pushRequest *setting.P
 		RequestId: pushRequest.Message.BusinessId,
 	}
 	url := p.buildMultiNotifyUrl()
-	
+
 	param := json.MarshalToStringNoError(pushMultiNotify)
 	request, err := p.httpClient.BuildRequest(ctx, "POST", url, param)
 	if err != nil {
@@ -138,12 +140,12 @@ func (p *PushClient) pushMultiNotify(ctx context.Context, pushRequest *setting.P
 	}
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("authToken", pushRequest.AccessToken)
-	
+
 	return p.httpClient.Do(ctx, request)
 }
 
 func (p *PushClient) saveMessageToCloud(ctx context.Context, pushRequest *setting.PushMessageRequest) (string, error) {
-	
+
 	saveMessageToCloud := &SaveMessageToCloud{
 		Title:       pushRequest.Message.Title,
 		Content:     pushRequest.Message.Content,
@@ -156,7 +158,7 @@ func (p *PushClient) saveMessageToCloud(ctx context.Context, pushRequest *settin
 			CallBackParam: pushRequest.Message.CallbackParam,
 		},
 	}
-	
+
 	uri := p.buildSaveMessageToCloudUrl()
 	param := json.MarshalToStringNoError(saveMessageToCloud)
 	request, err := p.httpClient.BuildRequest(ctx, "POST", uri, param)
@@ -172,15 +174,15 @@ func (p *PushClient) saveMessageToCloud(ctx context.Context, pushRequest *settin
 	saveResult := &SaveMessageToCloudResponse{}
 	errParse := json.UnmarshalByte(body, saveResult)
 	if errParse != nil {
-		log.Printf("parse saveMessage body err: %v", errParse)
+		log.Printf("[go-push-sdk] vivo message push parse saveMessage body err: %v", errParse)
 		return "", errcode.ErrParseBody
 	}
-	
+
 	return saveResult.TaskId, nil
 }
 
 func (p *PushClient) pushSingleNotify(ctx context.Context, pushRequest *setting.PushMessageRequest) ([]byte, error) {
-	
+
 	singleNotify := &PushSingleNotify{
 		RegId:       strings.Join(pushRequest.DeviceTokens, ","),
 		Title:       pushRequest.Message.Title,
@@ -194,9 +196,9 @@ func (p *PushClient) pushSingleNotify(ctx context.Context, pushRequest *setting.
 			CallBackParam: pushRequest.Message.CallbackParam,
 		},
 	}
-	
+
 	uri := p.buildSingleNotifyUrl()
-	
+
 	param := json.MarshalToStringNoError(singleNotify)
 	request, err := p.httpClient.BuildRequest(ctx, "POST", uri, param)
 	if err != nil {
@@ -204,22 +206,21 @@ func (p *PushClient) pushSingleNotify(ctx context.Context, pushRequest *setting.
 	}
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("authToken", pushRequest.AccessToken)
-	
+
 	return p.httpClient.Do(ctx, request)
 }
 
 func (p *PushClient) buildSingleNotifyUrl() string {
-	
+
 	return fmt.Sprintf("%s/%s", urlBase, actionSinglePush)
 }
 
 func (p *PushClient) buildSaveMessageToCloudUrl() string {
-	
+
 	return fmt.Sprintf("%s/%s", urlBase, actionSaveMessage)
 }
 
 func (p *PushClient) buildMultiNotifyUrl() string {
-	
+
 	return fmt.Sprintf("%s/%s", urlBase, actionMultiPush)
 }
-

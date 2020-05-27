@@ -6,7 +6,7 @@ import (
 	"log"
 	"sort"
 	"strings"
-	
+
 	"gitee.com/cristiane/go-push-sdk/push/common/crypt"
 	"gitee.com/cristiane/go-push-sdk/push/common/http"
 	"gitee.com/cristiane/go-push-sdk/push/common/intent"
@@ -26,10 +26,10 @@ const (
 
 type PushClient struct {
 	httpClient *http.Client
-	conf       *setting.PlatformMeizu
+	conf       *setting.MEIZU
 }
 
-func NewPushClient(conf *setting.PlatformMeizu) (*PushClient, error) {
+func NewPushClient(conf *setting.MEIZU) (*PushClient, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -40,7 +40,7 @@ func NewPushClient(conf *setting.PlatformMeizu) (*PushClient, error) {
 	}, nil
 }
 
-func checkConf(conf *setting.PlatformMeizu) error {
+func checkConf(conf *setting.MEIZU) error {
 	if conf.AppPkgName == "" {
 		return errcode.ErrAppPkgNameEmpty
 	}
@@ -69,12 +69,12 @@ func (p *PushClient) pushNotice(ctx context.Context, pushRequest *setting.PushMe
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return resp, err
 }
 
 func (p *PushClient) buildRequest(ctx context.Context, uri string, data map[string]string) ([]byte, error) {
-	
+
 	return p.httpClient.PostForm(ctx, uri, data)
 }
 
@@ -88,23 +88,24 @@ func (p *PushClient) buildMessage(pushRequest *setting.PushMessageRequest) map[s
 			ClickType: clickTypeTwo,
 			Url:       intent.GenerateIntent(p.conf.AppPkgName, pushRequest.Message.Extra),
 		},
-		Extra: &Extra{},
 	}
 	if pushRequest.Message.CallBack != "" {
+		payload.Extra = &Extra{}
 		payload.Extra.Callback = pushRequest.Message.CallBack
 		if pushRequest.Message.CallbackParam != "" {
 			payload.Extra.CallbackParam = pushRequest.Message.CallbackParam
 		}
 	}
-	messageMap := map[string]string{
+	msg := map[string]string{
 		"appId":       p.conf.AppId,
 		"pushIds":     strings.Join(pushRequest.DeviceTokens, ","),
 		"messageJson": json.MarshalToStringNoError(payload),
 	}
-	messageMap["sign"] = p.generateSign(messageMap)
-	p.generateSign(messageMap)
-	
-	return messageMap
+	msg["sign"] = p.generateSign(msg)
+
+	p.generateSign(msg)
+
+	return msg
 }
 
 func (p *PushClient) generateSign(params map[string]string) string {
@@ -112,19 +113,19 @@ func (p *PushClient) generateSign(params map[string]string) string {
 	for key, _ := range params {
 		keys = append(keys, key)
 	}
-	
+
 	str := ""
 	sort.Strings(keys)
 	for _, k := range keys {
 		str += fmt.Sprintf("%v=%v", k, params[k])
 	}
 	str += p.conf.AppSecret
-	
+
 	return crypt.MD5([]byte(str))
 }
 
 func (p *PushClient) buildUrl() string {
-	
+
 	return urlPush
 }
 
@@ -132,25 +133,24 @@ func (p *PushClient) parseBody(body []byte) (*PushMessageResponse, error) {
 	resp := &PushMessageResponse{}
 	err := json.UnmarshalByte(body, resp)
 	if err != nil {
-		log.Printf("meizu parseBody err: %v", err)
+		log.Printf("[go-push-sdk] meizu message push parseBody err: %v", err)
 		return nil, err
 	}
 	return resp, nil
 }
 
 func (p *PushClient) checkParam(pushRequest *setting.PushMessageRequest) error {
-	
+
 	err := message.CheckMessageParam(pushRequest, deviceTokenMin, deviceTokenMax, false)
 	if err != nil {
 		return err
 	}
 	// 其余参数检查
-	
+
 	return nil
 }
 
 func (p *PushClient) GetAccessToken() (interface{}, error) {
-	
+
 	return nil, nil
 }
-

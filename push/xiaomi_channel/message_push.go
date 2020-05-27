@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	
+
 	"gitee.com/cristiane/go-push-sdk/push/common/http"
 	"gitee.com/cristiane/go-push-sdk/push/common/intent"
 	"gitee.com/cristiane/go-push-sdk/push/common/json"
@@ -29,10 +29,10 @@ const (
 
 type PushClient struct {
 	httpClient *http.Client
-	conf       *setting.PlatformXiaomi
+	conf       *setting.XIAOMI
 }
 
-func NewPushClient(conf *setting.PlatformXiaomi) (*PushClient, error) {
+func NewPushClient(conf *setting.XIAOMI) (*PushClient, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -43,7 +43,7 @@ func NewPushClient(conf *setting.PlatformXiaomi) (*PushClient, error) {
 	}, nil
 }
 
-func checkConf(conf *setting.PlatformXiaomi) error {
+func checkConf(conf *setting.XIAOMI) error {
 	if conf.AppPkgName == "" {
 		return errcode.ErrAppPkgNameEmpty
 	}
@@ -54,12 +54,12 @@ func checkConf(conf *setting.PlatformXiaomi) error {
 }
 
 func (p *PushClient) checkParam(pushRequest *setting.PushMessageRequest) error {
-	
+
 	if err := message.CheckMessageParam(pushRequest, deviceTokenMin, deviceTokenMax, false); err != nil {
 		return err
 	}
 	// 其余参数检查
-	
+
 	return nil
 }
 
@@ -68,7 +68,7 @@ func (p *PushClient) PushNotice(ctx context.Context, pushRequest *setting.PushMe
 	if errCheck != nil {
 		return nil, errCheck
 	}
-	
+
 	return p.pushNotice(ctx, pushRequest)
 }
 
@@ -79,12 +79,12 @@ func (p *PushClient) pushNotice(ctx context.Context, pushRequest *setting.PushMe
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return p.parseBody(body)
 }
 
 func (p *PushClient) buildMessage(pushRequest *setting.PushMessageRequest) map[string]string {
-	
+
 	messageMap := map[string]string{
 		"payload":                 url.QueryEscape(pushRequest.Message.Content),
 		"restricted_package_name": p.conf.AppPkgName,
@@ -101,7 +101,7 @@ func (p *PushClient) buildMessage(pushRequest *setting.PushMessageRequest) map[s
 			messageMap["extra.callback.param"] = pushRequest.Message.CallbackParam
 		}
 	}
-	
+
 	return messageMap
 }
 
@@ -109,7 +109,7 @@ func (p *PushClient) parseBody(body []byte) (*PushMessageResponse, error) {
 	resp := &PushMessageResponse{}
 	err := json.UnmarshalByte(body, resp)
 	if err != nil {
-		log.Printf("xiaomi parseBody err: %v", err)
+		log.Printf("[go-push-sdk] xiaomi message push parseBody err: %v", err)
 		return nil, errcode.ErrParseBody
 	}
 	return resp, nil
@@ -122,17 +122,16 @@ func (p *PushClient) buildRequest(ctx context.Context, uri string, data map[stri
 	}
 	request.Header.Set("Authorization", fmt.Sprintf("key=%s", p.conf.AppSecret))
 	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	
+
 	return p.httpClient.Do(ctx, request)
 }
 
 func (p *PushClient) buildUrl() string {
-	
+
 	return urlPush
 }
 
 func (p *PushClient) GetAccessToken() (interface{}, error) {
-	
+
 	return nil, nil
 }
-

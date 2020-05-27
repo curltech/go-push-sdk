@@ -4,11 +4,11 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	
-	"github.com/gin-gonic/gin"
+
 	"gitee.com/cristiane/go-push-sdk/push"
 	"gitee.com/cristiane/go-push-sdk/push/common/json"
 	"gitee.com/cristiane/go-push-sdk/push/setting"
+	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -17,29 +17,29 @@ var (
 )
 
 func init() {
-	register, err = push.NewRegisterClient()
+	register, err = push.NewRegisterClient(push.DefaultConfFile)
 	if err != nil {
 		log.Fatalf("NewRegisterClient err: %v", err)
 	}
 }
 
 func main() {
-	
+
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
 	router.NoRoute(Handle404)
-	pushRouter := router.Group("/go-push")
-	huaweiRouter := pushRouter.Group("/huawei")
+	pushRouter := router.Group("/go-push-sdk")
+	huaweiRouter := pushRouter.Group("/ios")
 	{
-		huaweiRouter.GET("/push/access_token", huaweiAccessToken)
-		
+		huaweiRouter.GET("/access_token", huaweiAccessToken)
+
 		huaweiRouter.POST("/push", huaweiPush)
 	}
-	iphoneRouter := pushRouter.Group("/iphone")
+	iphoneRouter := pushRouter.Group("/ios")
 	{
-		iphoneRouter.POST("/push/cert", iphoneCert)
-		
-		iphoneRouter.POST("/push/token", iphoneToken)
+		iphoneRouter.POST("/cert-push", iphoneCert)
+
+		iphoneRouter.POST("/token-push", iphoneToken)
 	}
 	meizuRouter := pushRouter.Group("/meizu")
 	{
@@ -51,24 +51,24 @@ func main() {
 	}
 	oppoRouter := pushRouter.Group("/oppo")
 	{
-		oppoRouter.GET("/push/auth_token", oppoAuthToken)
-		
+		oppoRouter.GET("/auth_token", oppoAuthToken)
+
 		oppoRouter.POST("/push", oppoPush)
 	}
 	vivoRouter := pushRouter.Group("/vivo")
 	{
-		vivoRouter.GET("/push/auth_token", vivoAuthToken)
+		vivoRouter.GET("/auth_token", vivoAuthToken)
 		vivoRouter.POST("/push", vivoPush)
 	}
-	
-	errGinHttp := router.Run(":9090")
+
+	errGinHttp := router.Run(":80")
 	if errGinHttp != nil {
 		log.Fatalln(errGinHttp)
 	}
 }
 
 func huaweiAccessToken(c *gin.Context) {
-	
+
 	huaweiClient, err := register.GetHuaweiClient()
 	if err != nil {
 		log.Println("huawei get access_token err: ", err)
@@ -102,7 +102,7 @@ func huaweiAccessToken(c *gin.Context) {
 }
 
 func huaweiPush(c *gin.Context) {
-	
+
 	deviceTokens := c.PostForm("deviceTokens")
 	messageBusinessId := c.PostForm("messageBusinessId")
 	messageTitle := c.PostForm("messageTitle")
@@ -137,7 +137,7 @@ func huaweiPush(c *gin.Context) {
 		}
 		deviceAccessToken = accessTokenResp.AccessToken
 	}
-	
+
 	msg := &setting.PushMessageRequest{
 		DeviceTokens: strings.Split(deviceTokens, ","),
 		AccessToken:  deviceAccessToken,
@@ -182,7 +182,7 @@ func huaweiPush(c *gin.Context) {
 }
 
 func iphoneCert(c *gin.Context) {
-	
+
 	deviceTokens := c.PostForm("deviceTokens")
 	messageBusinessId := c.PostForm("messageBusinessId")
 	messageTitle := c.PostForm("messageTitle")
@@ -240,7 +240,7 @@ func iphoneCert(c *gin.Context) {
 }
 
 func iphoneToken(c *gin.Context) {
-	
+
 	deviceTokens := c.PostForm("deviceTokens")
 	messageBusinessId := c.PostForm("messageBusinessId")
 	messageTitle := c.PostForm("messageTitle")
@@ -249,7 +249,7 @@ func iphoneToken(c *gin.Context) {
 	messageExtra := c.PostForm("messageExtraJson")
 	messageCallBack := c.PostForm("messageCallBack")
 	messageCallBackParam := c.PostForm("messageCallBackParam")
-	
+
 	msg := &setting.PushMessageRequest{
 		DeviceTokens: strings.Split(deviceTokens, ","),
 		AccessToken:  "",
@@ -299,7 +299,7 @@ func iphoneToken(c *gin.Context) {
 }
 
 func meizuPush(c *gin.Context) {
-	
+
 	deviceTokens := c.PostForm("deviceTokens")
 	messageBusinessId := c.PostForm("messageBusinessId")
 	messageTitle := c.PostForm("messageTitle")
@@ -308,7 +308,7 @@ func meizuPush(c *gin.Context) {
 	messageExtra := c.PostForm("messageExtraJson")
 	messageCallBack := c.PostForm("messageCallBack")
 	messageCallBackParam := c.PostForm("messageCallBackParam")
-	
+
 	msg := &setting.PushMessageRequest{
 		DeviceTokens: strings.Split(deviceTokens, ","),
 		AccessToken:  "",
@@ -333,7 +333,7 @@ func meizuPush(c *gin.Context) {
 		}
 		msg.Message.Extra = messageExtraMap
 	}
-	
+
 	meizuClient, err := register.GetMeizuClient()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -361,7 +361,7 @@ func meizuPush(c *gin.Context) {
 }
 
 func xiaomiPush(c *gin.Context) {
-	
+
 	deviceTokens := c.PostForm("deviceTokens")
 	messageBusinessId := c.PostForm("messageBusinessId")
 	messageTitle := c.PostForm("messageTitle")
@@ -370,7 +370,7 @@ func xiaomiPush(c *gin.Context) {
 	messageExtra := c.PostForm("messageExtraJson")
 	messageCallBack := c.PostForm("messageCallBack")
 	messageCallBackParam := c.PostForm("messageCallBackParam")
-	
+
 	msg := &setting.PushMessageRequest{
 		DeviceTokens: strings.Split(deviceTokens, ","),
 		AccessToken:  "",
@@ -448,7 +448,7 @@ func oppoAuthToken(c *gin.Context) {
 }
 
 func oppoPush(c *gin.Context) {
-	
+
 	deviceTokens := c.PostForm("deviceTokens")
 	messageBusinessId := c.PostForm("messageBusinessId")
 	messageTitle := c.PostForm("messageTitle")
@@ -543,7 +543,7 @@ func vivoAuthToken(c *gin.Context) {
 }
 
 func vivoPush(c *gin.Context) {
-	
+
 	deviceTokens := c.PostForm("deviceTokens")
 	messageBusinessId := c.PostForm("messageBusinessId")
 	messageTitle := c.PostForm("messageTitle")
@@ -553,7 +553,7 @@ func vivoPush(c *gin.Context) {
 	messageCallBack := c.PostForm("messageCallBack")
 	messageCallBackParam := c.PostForm("messageCallBackParam")
 	deviceAccessToken := c.PostForm("accessToken")
-	
+
 	vivoClient, err := register.GetVIVOClient()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -573,7 +573,7 @@ func vivoPush(c *gin.Context) {
 		}
 		deviceAccessToken = authTokenResp.AuthToken
 	}
-	
+
 	msg := &setting.PushMessageRequest{
 		DeviceTokens: strings.Split(deviceTokens, ","),
 		AccessToken:  deviceAccessToken,

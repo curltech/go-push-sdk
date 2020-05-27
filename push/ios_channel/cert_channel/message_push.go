@@ -4,19 +4,34 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	
-	"github.com/sideshow/apns2"
-	"github.com/sideshow/apns2/certificate"
+
+	"gitee.com/cristiane/go-push-sdk/push/common/convert"
 	"gitee.com/cristiane/go-push-sdk/push/common/message"
 	"gitee.com/cristiane/go-push-sdk/push/errcode"
 	"gitee.com/cristiane/go-push-sdk/push/ios_channel"
 	"gitee.com/cristiane/go-push-sdk/push/setting"
+	"github.com/sideshow/apns2"
+	"github.com/sideshow/apns2/certificate"
 )
 
 const (
 	deviceTokenMax = 100
 	deviceTokenMin = 1
 )
+
+type PushClient struct {
+	conf *setting.IOS_CERT
+}
+
+func NewPushClient(conf *setting.IOS_CERT) (*PushClient, error) {
+	errCheck := checkConf(conf)
+	if errCheck != nil {
+		return nil, errCheck
+	}
+	return &PushClient{
+		conf: conf,
+	}, nil
+}
 
 func (p *PushClient) buildRequest(ctx context.Context, pushRequest *setting.PushMessageRequest) (*ios_channel.PushMessageResponse, error) {
 	var (
@@ -26,15 +41,16 @@ func (p *PushClient) buildRequest(ctx context.Context, pushRequest *setting.Push
 	if err != nil {
 		return nil, err
 	}
-	payloadStr := fmt.Sprintf(ios_channel.PayloadTemplate, pushRequest.Message.Title, pushRequest.Message.SubTitle, pushRequest.Message.Content, pushRequest.Message.Extra)
-	
+	payloadStr := fmt.Sprintf(ios_channel.PayloadTemplate, pushRequest.Message.Title, pushRequest.Message.SubTitle, pushRequest.Message.Content,
+		pushRequest.Message.Extra)
+
 	notification := &apns2.Notification{
 		DeviceToken: strings.Join(pushRequest.DeviceTokens, ","),
 		ApnsID:      pushRequest.Message.BusinessId,
 		CollapseID:  pushRequest.Message.BusinessId,
-		Payload:     []byte(payloadStr),
+		Payload:     convert.Str2Byte(payloadStr),
 	}
-	
+
 	if p.conf.IsSandBox {
 		client = apns2.NewClient(cert).Development()
 	} else {
@@ -51,21 +67,7 @@ func (p *PushClient) buildRequest(ctx context.Context, pushRequest *setting.Push
 	}, nil
 }
 
-type PushClient struct {
-	conf *setting.PlatformAppleCert
-}
-
-func NewPushClient(conf *setting.PlatformAppleCert) (*PushClient, error) {
-	errCheck := checkConf(conf)
-	if errCheck != nil {
-		return nil, errCheck
-	}
-	return &PushClient{
-		conf: conf,
-	}, nil
-}
-
-func checkConf(conf *setting.PlatformAppleCert) error {
+func checkConf(conf *setting.IOS_CERT) error {
 	if conf.CertPath == "" {
 		return errcode.ErrCertPathEmpty
 	}
@@ -84,12 +86,12 @@ func (p *PushClient) PushNotice(ctx context.Context, pushRequest *setting.PushMe
 }
 
 func (p *PushClient) pushNotice(ctx context.Context, pushRequest *setting.PushMessageRequest) (*ios_channel.PushMessageResponse, error) {
-	
+
 	return p.buildRequest(ctx, pushRequest)
 }
 
 func (p *PushClient) checkParam(pushRequest *setting.PushMessageRequest) error {
-	
+
 	if err := message.CheckMessageParam(pushRequest, deviceTokenMin, deviceTokenMax, false); err != nil {
 		return err
 	}
@@ -97,11 +99,11 @@ func (p *PushClient) checkParam(pushRequest *setting.PushMessageRequest) error {
 		return errcode.ErrBusinessIdEmpty
 	}
 	// 其余参数检查
-	
+
 	return nil
 }
 
 func (p *PushClient) GetAccessToken() (interface{}, error) {
-	
+
 	return nil, nil
 }

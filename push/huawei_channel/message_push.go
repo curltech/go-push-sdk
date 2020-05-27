@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	
+
 	"gitee.com/cristiane/go-push-sdk/push/common/http"
 	"gitee.com/cristiane/go-push-sdk/push/common/intent"
 	"gitee.com/cristiane/go-push-sdk/push/common/json"
@@ -30,11 +30,12 @@ const (
 )
 
 type PushClient struct {
-	conf       *setting.PlatformHuawei
+	conf       *setting.HUAWEI
 	httpClient *http.Client
+	authClient *AccessToken
 }
 
-func NewPushClient(conf *setting.PlatformHuawei) (*PushClient, error) {
+func NewPushClient(conf *setting.HUAWEI) (*PushClient, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -42,10 +43,11 @@ func NewPushClient(conf *setting.PlatformHuawei) (*PushClient, error) {
 	return &PushClient{
 		conf:       conf,
 		httpClient: http.NewClient(timeout),
+		authClient: NewAccessToken(),
 	}, nil
 }
 
-func checkConf(conf *setting.PlatformHuawei) error {
+func checkConf(conf *setting.HUAWEI) error {
 	if conf.AppPkgName == "" {
 		return errcode.ErrAppPkgNameEmpty
 	}
@@ -55,7 +57,7 @@ func checkConf(conf *setting.PlatformHuawei) error {
 	if conf.ClientSecret == "" {
 		return errcode.ErrClientSecretEmpty
 	}
-	
+
 	return nil
 }
 
@@ -66,17 +68,17 @@ func (p *PushClient) checkParam(pushRequest *setting.PushMessageRequest) error {
 		return err
 	}
 	// 其余参数检查
-	
+
 	return nil
 }
 
 func (p *PushClient) GetAccessToken(ctx context.Context) (*AccessTokenResp, error) {
-	accessToken := NewAccessToken()
+
 	accessTokenReq := &AccessTokenReq{
 		ClientId:     p.conf.ClientId,
 		ClientSecret: p.conf.ClientSecret,
 	}
-	return accessToken.Get(ctx, accessTokenReq)
+	return p.authClient.Get(ctx, accessTokenReq)
 }
 
 func (p *PushClient) buildUrl() string {
@@ -96,39 +98,33 @@ func (p *PushClient) buildUrl() string {
 }
 
 func (p *PushClient) buildMessage(pushRequest *setting.PushMessageRequest) map[string]string {
-	msg := &PushMessageRequest{
-		AccessToken:     pushRequest.AccessToken,
-		NspSvc:          nspSvcDefault,
-		NspTs:           strconv.FormatInt(time.Now().Local().Unix(), 10),
-		ExpireTime:      pushRequest.ExpireTime,
-		DeviceTokenList: pushRequest.DeviceTokens,
-		PayLoad: &PayLoad{
-			Hps: &Hps{
-				Msg: &Msg{
-					Type: typeMsgNotificationBar,
-					Body: &Body{
-						Content: pushRequest.Message.Content,
-						Title:   pushRequest.Message.Title,
-					},
-					Action: &Action{
-						Type: typeActionCustom,
-						Param: &Param{
-							AppPkgName: p.conf.AppPkgName,
-							Intent:     intent.GenerateIntent(p.conf.AppPkgName, pushRequest.Message.Extra),
-						},
+	msgPayload := &PayLoad{
+		Hps: &Hps{
+			Msg: &Msg{
+				Type: typeMsgNotificationBar,
+				Body: &Body{
+					Content: pushRequest.Message.Content,
+					Title:   pushRequest.Message.Title,
+				},
+				Action: &Action{
+					Type: typeActionCustom,
+					Param: &Param{
+						AppPkgName: p.conf.AppPkgName,
+						Intent:     intent.GenerateIntent(p.conf.AppPkgName, pushRequest.Message.Extra),
 					},
 				},
 			},
 		},
 	}
+
 	msgMap := map[string]string{
-		"access_token":      msg.AccessToken,
-		"nsp_svc":           msg.NspSvc,
-		"nsp_ts":            msg.NspTs,
-		"device_token_list": json.MarshalToStringNoError(msg.DeviceTokenList),
-		"payload":           json.MarshalToStringNoError(msg.PayLoad),
+		"access_token":      pushRequest.AccessToken,
+		"nsp_svc":           nspSvcDefault,
+		"nsp_ts":            strconv.FormatInt(time.Now().Local().Unix(), 10),
+		"device_token_list": json.MarshalToStringNoError(pushRequest.DeviceTokens),
+		"payload":           json.MarshalToStringNoError(msgPayload),
 	}
-	
+
 	return msgMap
 }
 
@@ -144,25 +140,24 @@ func (p *PushClient) parseBody(body []byte) (*PushMessageResponse, error) {
 	resp := &PushMessageResponse{}
 	err := json.UnmarshalByte(body, resp)
 	if err != nil {
-		log.Printf("huawei parseBody err: %v", err)
+		log.Printf("[go-push-sdk] huawei parseBody err: %v", err)
 		return nil, errcode.ErrParseBody
 	}
 	return resp, nil
 }
 
-func (p *PushClient) buildRequest(ctx context.Context, uri string, data map[string]string) ([]byte, error) {
-	
+func (p *PushClient) doRequest(ctx context.Context, uri string, data map[string]string) ([]byte, error) {
+
 	return p.httpClient.PostForm(ctx, uri, data)
 }
 
 func (p *PushClient) pushNotice(ctx context.Context, pushRequest *setting.PushMessageRequest) (*PushMessageResponse, error) {
 	msg := p.buildMessage(pushRequest)
 	pushUrl := p.buildUrl()
-	body, err := p.buildRequest(ctx, pushUrl, msg)
+	body, err := p.doRequest(ctx, pushUrl, msg)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return p.parseBody(body)
 }
-

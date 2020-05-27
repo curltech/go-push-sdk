@@ -1,56 +1,55 @@
 package setting
 
-type PlatformAll struct {
-	Huawei   *PlatformHuawei     `json:"huawei"`
-	Xiaomi   *PlatformXiaomi     `json:"xiaomi"`
-	Meizu    *PlatformMeizu      `json:"meizu"`
-	OPPO     *PlatformOPPO       `json:"oppo"`
-	VIVO     *PlatformVIVO       `json:"vivo"`
-	Ios      *PlatformAppleCert  `json:"ios"`
-	IosToken *PlatformAppleToken `json:"ios-token"`
+type PushConfig struct {
+	*HUAWEI    `json:"huawei"`
+	*XIAOMI    `json:"xiaomi"`
+	*MEIZU     `json:"meizu"`
+	*OPPO      `json:"oppo"`
+	*VIVO      `json:"vivo"`
+	*IOS_CERT  `json:"ios"`
+	*IOS_TOKEN `json:"ios-token"`
 }
 
-type PlatformHuawei struct {
+type HUAWEI struct {
 	AppPkgName   string `json:"appPkgName"`   // 应用包名
 	ClientId     string `json:"clientId"`     // 用户在联盟申请的APPID
 	ClientSecret string `json:"clientSecret"` // 应用秘钥
 }
 
-type PlatformXiaomi struct {
+type XIAOMI struct {
 	AppPkgName string `json:"appPkgName"`
 	AppSecret  string `json:"appSecret"`
 }
 
-type PlatformMeizu struct {
+type MEIZU struct {
 	AppPkgName string `json:"appPkgName"`
 	AppId      string `json:"appId"`
 	AppSecret  string `json:"appSecret"`
 }
 
-type PlatformOPPO struct {
+type OPPO struct {
 	AppPkgName   string `json:"appPkgName"`
 	AppKey       string `json:"appKey"`
 	MasterSecret string `json:"masterSecret"`
 }
 
-type PlatformVIVO struct {
+type VIVO struct {
 	AppPkgName string `json:"appPkgName"`
 	AppId      string `json:"appId"`
 	AppKey     string `json:"appKey"`
 	AppSecret  string `json:"appSecret"`
 }
 
-type PlatformAppleCert struct {
+type IOS_CERT struct {
 	IsSandBox bool   `json:"isSandBox"`
 	CertPath  string `json:"certPath"`
 	Password  string `json:"password"`
 }
 
-type PlatformAppleToken struct {
+type IOS_TOKEN struct {
 	IsSandBox  bool   `json:"isSandBox"`
 	TeamId     string `json:"teamId"`
 	KeyId      string `json:"keyId"`
 	SecretFile string `json:"secretFile"`
 	BundleId   string `json:"bundleId"`
 }
-

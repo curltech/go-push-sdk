@@ -7,12 +7,11 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	
+
 	"gitee.com/cristiane/go-push-sdk/push/common/http"
 	"gitee.com/cristiane/go-push-sdk/push/common/intent"
 	"gitee.com/cristiane/go-push-sdk/push/common/json"
 	"gitee.com/cristiane/go-push-sdk/push/common/message"
-	"gitee.com/cristiane/go-push-sdk/push/common/slice"
 	"gitee.com/cristiane/go-push-sdk/push/errcode"
 	"gitee.com/cristiane/go-push-sdk/push/setting"
 )
@@ -32,10 +31,11 @@ const (
 
 type PushClient struct {
 	httpClient *http.Client
-	conf       *setting.PlatformOPPO
+	conf       *setting.OPPO
+	authClient *AuthToken
 }
 
-func NewPushClient(conf *setting.PlatformOPPO) (*PushClient, error) {
+func NewPushClient(conf *setting.OPPO) (*PushClient, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -43,10 +43,11 @@ func NewPushClient(conf *setting.PlatformOPPO) (*PushClient, error) {
 	return &PushClient{
 		conf:       conf,
 		httpClient: http.NewClient(timeout),
+		authClient: NewAuthToken(),
 	}, nil
 }
 
-func checkConf(conf *setting.PlatformOPPO) error {
+func checkConf(conf *setting.OPPO) error {
 	if conf.AppPkgName == "" {
 		return errcode.ErrAppPkgNameEmpty
 	}
@@ -56,7 +57,7 @@ func checkConf(conf *setting.PlatformOPPO) error {
 	if conf.MasterSecret == "" {
 		return errcode.ErrMasterSecretEmpty
 	}
-	
+
 	return nil
 }
 
@@ -65,18 +66,18 @@ func (p *PushClient) PushNotice(ctx context.Context, pushRequest *setting.PushMe
 	if errCheck != nil {
 		return nil, errCheck
 	}
-	
+
 	return p.pushNotice(ctx, pushRequest)
 }
 
 func (p *PushClient) checkParam(pushRequest *setting.PushMessageRequest) error {
-	
+
 	err := message.CheckMessageParam(pushRequest, deviceTokenMin, deviceTokenMax, true)
 	if err != nil {
 		return err
 	}
 	// 其余参数检查
-	
+
 	return nil
 }
 
@@ -86,7 +87,7 @@ func (p *PushClient) pushNotice(ctx context.Context, pushRequest *setting.PushMe
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return p.parseBody(body)
 }
 
@@ -108,38 +109,30 @@ func (p *PushClient) pushGateWay(ctx context.Context, pushRequest *setting.PushM
 }
 
 func (p *PushClient) buildMessage(pushRequest *setting.PushMessageRequest) map[string]string {
-	
-	pushRequest.DeviceTokens = slice.RemoveDuplicateElement(pushRequest.DeviceTokens)
-	messageAll := &PushMessageRequest{
-		Title:             pushRequest.Message.Title,
-		SubTitle:          pushRequest.Message.SubTitle,
-		Content:           pushRequest.Message.Content,
-		ClickActionType:   clickActionTypeFive,
-		ClickActionUrl:    intent.GenerateIntent(p.conf.AppPkgName, pushRequest.Message.Extra),
-		CallBackUrl:       pushRequest.Message.CallBack,
-		CallBackParameter: pushRequest.Message.CallbackParam,
-	}
-	
+
+	//pushRequest.DeviceTokens = slice.RemoveDuplicateElement(pushRequest.DeviceTokens)
 	messageMap := map[string]string{
-		"title":             messageAll.Title,
-		"sub_title":         messageAll.SubTitle,
-		"content":           messageAll.Content,
-		"click_action_type": strconv.Itoa(messageAll.ClickActionType),
-		"click_action_url":  messageAll.ClickActionUrl,
+		"title":             pushRequest.Message.Title,
+		"sub_title":         pushRequest.Message.SubTitle,
+		"content":           pushRequest.Message.Content,
+		"click_action_type": strconv.Itoa(clickActionTypeFive),
+		"click_action_url":  intent.GenerateIntent(p.conf.AppPkgName, pushRequest.Message.Extra),
 	}
-	if messageAll.CallBackUrl != "" {
-		messageMap["call_back_url"] = messageAll.CallBackUrl
-		if messageAll.CallBackParameter != "" {
-			messageMap["call_back_parameter"] = messageAll.CallBackParameter
+	if pushRequest.Message.CallBack != "" {
+		messageMap["call_back_url"] = pushRequest.Message.CallBack
+		if pushRequest.Message.CallbackParam != "" {
+			messageMap["call_back_parameter"] = pushRequest.Message.CallbackParam
 		}
 	}
-	
+
 	return messageMap
 }
 
 func (p *PushClient) saveMessageToCloud(ctx context.Context, authToken string, message map[string]string) (string, error) {
 	message["auth_token"] = authToken
+
 	uri := p.buildSaveMessageContentPushUrl()
+
 	body, err := p.httpClient.PostForm(ctx, uri, message)
 	if err != nil {
 		return "", err
@@ -153,80 +146,69 @@ func (p *PushClient) saveMessageToCloud(ctx context.Context, authToken string, m
 	if result.Code == 11 {
 		return "", errors.New(result.Message)
 	}
-	
+
 	return result.Data.MessageId, nil
 }
 
 func (p *PushClient) pushBroadcast(ctx context.Context, messageId string, pushRequest *setting.PushMessageRequest) ([]byte, error) {
-	broadcastPushMessage := &BroadcastPush{
-		MessageId:   messageId,
-		TargetType:  targetTypeTwo,
-		TargetValue: strings.Join(pushRequest.DeviceTokens, ","),
-		AuthToken:   pushRequest.AccessToken,
-	}
+
 	msg := map[string]string{
-		"message_id":   broadcastPushMessage.MessageId,
-		"target_type":  strconv.Itoa(broadcastPushMessage.TargetType),
-		"target_value": broadcastPushMessage.TargetValue,
-		"auth_token":   broadcastPushMessage.AuthToken,
+		"message_id":   messageId,
+		"target_type":  strconv.Itoa(targetTypeTwo),
+		"target_value": strings.Join(pushRequest.DeviceTokens, ","),
+		"auth_token":   pushRequest.AccessToken,
 	}
 	url := p.buildBroadcastPushUrl()
-	
+
 	return p.httpClient.PostForm(ctx, url, msg)
 }
 
 func (p *PushClient) pushSingle(ctx context.Context, pushRequest *setting.PushMessageRequest, message map[string]string) ([]byte, error) {
-	singlePushMessage := &SinglePush{
-		AuthToken: pushRequest.AccessToken,
-		Message: &SingleMessage{
+
+	param := map[string]string{
+		"message": json.MarshalToStringNoError(&SingleMessage{
 			TargetType:   targetTypeTwo,
 			TargetValue:  strings.Join(pushRequest.DeviceTokens, ","),
 			Notification: message,
-		},
-	}
-	
-	param := map[string]string{
-		"message":    json.MarshalToStringNoError(singlePushMessage.Message),
-		"auth_token": singlePushMessage.AuthToken,
+		}),
+		"auth_token": pushRequest.AccessToken,
 	}
 	uri := p.buildSinglePushUrl()
-	
+
 	return p.httpClient.PostForm(ctx, uri, param)
 }
 
 func (p *PushClient) buildSinglePushUrl() string {
-	
+
 	return fmt.Sprintf("%s/%s", urlBase, actionPush)
 }
 
 func (p *PushClient) buildBroadcastPushUrl() string {
-	
+
 	return fmt.Sprintf("%s/%s", urlBase, actionBroadcast)
 }
 
 func (p *PushClient) buildSaveMessageContentPushUrl() string {
-	
+
 	return fmt.Sprintf("%s/%s", urlBase, actionSaveMessageContent)
 }
 
 func (p *PushClient) parseBody(body []byte) (*PushMessageResponse, error) {
 	resp := &PushMessageResponse{}
-	log.Printf("body : %v", string(body))
 	err := json.UnmarshalByte(body, resp)
 	if err != nil {
-		log.Printf("parseBody err: %v", err)
+		log.Printf("[go-push-sdk] oppo message push parseBody err: %v", err)
 		return nil, errcode.ErrParseBody
 	}
-	
+
 	return resp, nil
 }
 
 func (p *PushClient) GetAccessToken(ctx context.Context) (*AuthTokenResp, error) {
-	authToken := NewAuthToken()
+
 	authTokenReq := &AuthTokenReq{
 		AppKey:       p.conf.AppKey,
 		MasterSecret: p.conf.MasterSecret,
 	}
-	return authToken.Get(ctx, authTokenReq)
+	return p.authClient.Get(ctx, authTokenReq)
 }
-

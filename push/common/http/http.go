@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -15,11 +16,15 @@ const (
 	contentTypeJson = "application/json"
 )
 
+var clientPool = sync.Pool{New: func() interface{} {
+	return newClient(maxTimeout)
+}}
+
 type Client struct {
 	tracingClient *http.Client
 }
 
-func NewClient(timeout int) *Client {
+func newClient(timeout int) *Client {
 	if timeout <= 0 && timeout > maxTimeout {
 		timeout = maxTimeout
 	}
@@ -30,12 +35,23 @@ func NewClient(timeout int) *Client {
 	}
 }
 
+func NewClient(timeout int) *Client {
+	obj := clientPool.Get()
+	if obj == nil {
+		return newClient(timeout)
+	} else {
+		c := (obj).(*Client)
+		c.tracingClient.Timeout = 0
+		return c
+	}
+}
+
 func (c *Client) Get(ctx context.Context, uri string) ([]byte, error) {
 	resp, err := c.tracingClient.Get(uri)
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return c.readBody(resp)
 }
 
@@ -66,12 +82,12 @@ func (c *Client) Do(ctx context.Context, request *http.Request) ([]byte, error) 
 }
 
 func (c *Client) PostForm(ctx context.Context, uri string, params interface{}) ([]byte, error) {
-	
+
 	return c.Post(ctx, uri, params, contentTypeForm)
 }
 
 func (c *Client) PostJson(ctx context.Context, uri string, params interface{}) ([]byte, error) {
-	
+
 	return c.Post(ctx, uri, params, contentTypeJson)
 }
 
@@ -89,7 +105,7 @@ func (c *Client) readBody(resp *http.Response) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return body, nil
 }
 
@@ -107,7 +123,6 @@ func (c *Client) Post(ctx context.Context, uri string, params interface{}, conte
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return c.readBody(resp)
 }
-
