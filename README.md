@@ -45,7 +45,7 @@ IOS：支持两种推送模式
 				"link_type":   "TaskList",
 				"link_params": "[]",
 			},
-			CallBack:      "https://vengineer.myysq.com.cn/app-push/callback-oppo",
+			CallBack:      "https://xxxx.xxx.com.cn/app-push/callback-oppo",
 			CallbackParam: "",
 		},
 	}
