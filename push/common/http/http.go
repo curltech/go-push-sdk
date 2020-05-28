@@ -38,7 +38,9 @@ func newClient(timeout int) *Client {
 func NewClient(timeout int) *Client {
 	obj := clientPool.Get()
 	if obj == nil {
-		return newClient(timeout)
+		c := newClient(timeout)
+		clientPool.Put(c)
+		return c
 	} else {
 		c := (obj).(*Client)
 		c.tracingClient.Timeout = 0
