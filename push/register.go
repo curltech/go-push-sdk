@@ -61,26 +61,26 @@ func NewRegisterClientWithConf(cfgJson string) (*RegisterClient, error) {
 	return newRegisterClient(cfgJson, obj)
 }
 
-func (r *RegisterClient) GetPlatformClient(platform string) (setting.PushClientInterface, error) {
-	if platform == "huawei" {
+func (r *RegisterClient) GetPlatformClient(platform setting.PlatformType) (setting.PushClientInterface, error) {
+	if platform == setting.HUAWEI_PLATFORM {
 		return r.GetHUAWEIClient()
 	}
-	if platform == "meizu" {
+	if platform == setting.MEIZU_PLATFORM {
 		return r.GetMEIZUClient()
 	}
-	if platform == "oppo" {
+	if platform == setting.OPPO_PLATFORM {
 		return r.GetOPPOClient()
 	}
-	if platform == "vivo" {
+	if platform == setting.VIVO_PLATFORM {
 		return r.GetVIVOClient()
 	}
-	if platform == "xiaomi" {
+	if platform == setting.XIAOMI_PLATFORM {
 		return r.GetXIAOMIClient()
 	}
-	if platform == "ios" {
+	if platform == setting.IOS_CERT_PLATFORM {
 		return r.GetIosCertClient()
 	}
-	if platform == "ios-token" {
+	if platform == setting.IOS_TOKEN_PLATFORM {
 		return r.GetIosTokenClient()
 	}
 	return nil, errors.New("UNKNOWN REGISTER PLATFORM ？")
@@ -88,7 +88,7 @@ func (r *RegisterClient) GetPlatformClient(platform string) (setting.PushClientI
 
 func (r *RegisterClient) GetHUAWEIClient() (setting.PushClientInterface, error) {
 
-	return huawei_channel.NewPushClient(r.cfg.(*setting.PushConfig).HUAWEI)
+	return huawei_channel.NewPushClient(r.cfg.(setting.PushConfig).HUAWEI)
 }
 
 func (r *RegisterClient) GetMEIZUClient() (setting.PushClientInterface, error) {

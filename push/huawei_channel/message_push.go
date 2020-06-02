@@ -30,12 +30,12 @@ const (
 )
 
 type PushClient struct {
-	conf       *setting.HUAWEI
+	conf       setting.HUAWEI
 	httpClient *http.Client
 	authClient *AccessToken
 }
 
-func NewPushClient(conf *setting.HUAWEI) (setting.PushClientInterface, error) {
+func NewPushClient(conf setting.HUAWEI) (setting.PushClientInterface, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -47,7 +47,7 @@ func NewPushClient(conf *setting.HUAWEI) (setting.PushClientInterface, error) {
 	}, nil
 }
 
-func checkConf(conf *setting.HUAWEI) error {
+func checkConf(conf setting.HUAWEI) error {
 	if conf.AppPkgName == "" {
 		return errcode.ErrAppPkgNameEmpty
 	}

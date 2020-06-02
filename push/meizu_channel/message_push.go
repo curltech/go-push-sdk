@@ -26,10 +26,10 @@ const (
 
 type PushClient struct {
 	httpClient *http.Client
-	conf       *setting.MEIZU
+	conf       setting.MEIZU
 }
 
-func NewPushClient(conf *setting.MEIZU) (setting.PushClientInterface, error) {
+func NewPushClient(conf setting.MEIZU) (setting.PushClientInterface, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -40,7 +40,7 @@ func NewPushClient(conf *setting.MEIZU) (setting.PushClientInterface, error) {
 	}, nil
 }
 
-func checkConf(conf *setting.MEIZU) error {
+func checkConf(conf setting.MEIZU) error {
 	if conf.AppPkgName == "" {
 		return errcode.ErrAppPkgNameEmpty
 	}

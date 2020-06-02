@@ -20,10 +20,10 @@ const (
 )
 
 type PushClient struct {
-	conf *setting.IOS_CERT
+	conf setting.IOS_CERT
 }
 
-func NewPushClient(conf *setting.IOS_CERT) (setting.PushClientInterface, error) {
+func NewPushClient(conf setting.IOS_CERT) (setting.PushClientInterface, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -67,7 +67,7 @@ func (p *PushClient) buildRequest(ctx context.Context, pushRequest *setting.Push
 	}, nil
 }
 
-func checkConf(conf *setting.IOS_CERT) error {
+func checkConf(conf setting.IOS_CERT) error {
 	if conf.CertPath == "" {
 		return errcode.ErrCertPathEmpty
 	}

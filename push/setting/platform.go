@@ -1,13 +1,25 @@
 package setting
 
+type PlatformType string
+
+const (
+	HUAWEI_PLATFORM    PlatformType = "huawei"
+	XIAOMI_PLATFORM    PlatformType = "xiaomi"
+	MEIZU_PLATFORM     PlatformType = "meizu"
+	VIVO_PLATFORM      PlatformType = "vivo"
+	OPPO_PLATFORM      PlatformType = "oppo"
+	IOS_CERT_PLATFORM  PlatformType = "ios"
+	IOS_TOKEN_PLATFORM PlatformType = "ios-token"
+)
+
 type PushConfig struct {
-	*HUAWEI    `json:"huawei"`
-	*XIAOMI    `json:"xiaomi"`
-	*MEIZU     `json:"meizu"`
-	*OPPO      `json:"oppo"`
-	*VIVO      `json:"vivo"`
-	*IOS_CERT  `json:"ios"`
-	*IOS_TOKEN `json:"ios-token"`
+	HUAWEI    `json:"huawei"`
+	XIAOMI    `json:"xiaomi"`
+	MEIZU     `json:"meizu"`
+	OPPO      `json:"oppo"`
+	VIVO      `json:"vivo"`
+	IOS_CERT  `json:"ios"`
+	IOS_TOKEN `json:"ios-token"`
 }
 
 type HUAWEI struct {
