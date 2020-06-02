@@ -64,26 +64,21 @@ func NewRegisterClientWithConf(cfgJson string) (*RegisterClient, error) {
 func (r *RegisterClient) GetPlatformClient(platform setting.PlatformType) (setting.PushClientInterface, error) {
 	if platform == setting.HUAWEI_PLATFORM {
 		return r.GetHUAWEIClient()
-	}
-	if platform == setting.MEIZU_PLATFORM {
+	} else if platform == setting.MEIZU_PLATFORM {
 		return r.GetMEIZUClient()
-	}
-	if platform == setting.OPPO_PLATFORM {
+	} else if platform == setting.OPPO_PLATFORM {
 		return r.GetOPPOClient()
-	}
-	if platform == setting.VIVO_PLATFORM {
+	} else if platform == setting.VIVO_PLATFORM {
 		return r.GetVIVOClient()
-	}
-	if platform == setting.XIAOMI_PLATFORM {
+	} else if platform == setting.XIAOMI_PLATFORM {
 		return r.GetXIAOMIClient()
-	}
-	if platform == setting.IOS_CERT_PLATFORM {
+	} else if platform == setting.IOS_CERT_PLATFORM {
 		return r.GetIosCertClient()
-	}
-	if platform == setting.IOS_TOKEN_PLATFORM {
+	} else if platform == setting.IOS_TOKEN_PLATFORM {
 		return r.GetIosTokenClient()
+	} else {
+		return nil, errcode.ErrUnknownPlatform
 	}
-	return nil, errors.New("UNKNOWN REGISTER PLATFORM ？")
 }
 
 func (r *RegisterClient) GetHUAWEIClient() (setting.PushClientInterface, error) {
