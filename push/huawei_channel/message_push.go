@@ -35,7 +35,7 @@ type PushClient struct {
 	authClient *AccessToken
 }
 
-func NewPushClient(conf *setting.HUAWEI) (*PushClient, error) {
+func NewPushClient(conf *setting.HUAWEI) (setting.PushClientInterface, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -72,7 +72,7 @@ func (p *PushClient) checkParam(pushRequest *setting.PushMessageRequest) error {
 	return nil
 }
 
-func (p *PushClient) GetAccessToken(ctx context.Context) (*AccessTokenResp, error) {
+func (p *PushClient) GetAccessToken(ctx context.Context) (interface{}, error) {
 
 	accessTokenReq := &AccessTokenReq{
 		ClientId:     p.conf.ClientId,
@@ -128,7 +128,7 @@ func (p *PushClient) buildMessage(pushRequest *setting.PushMessageRequest) map[s
 	return msgMap
 }
 
-func (p *PushClient) PushNotice(ctx context.Context, pushRequest *setting.PushMessageRequest) (*PushMessageResponse, error) {
+func (p *PushClient) PushNotice(ctx context.Context, pushRequest *setting.PushMessageRequest) (interface{}, error) {
 	errCheck := p.checkParam(pushRequest)
 	if errCheck != nil {
 		return nil, errCheck

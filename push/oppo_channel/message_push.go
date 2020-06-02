@@ -35,7 +35,7 @@ type PushClient struct {
 	authClient *AuthToken
 }
 
-func NewPushClient(conf *setting.OPPO) (*PushClient, error) {
+func NewPushClient(conf *setting.OPPO) (setting.PushClientInterface, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -61,7 +61,7 @@ func checkConf(conf *setting.OPPO) error {
 	return nil
 }
 
-func (p *PushClient) PushNotice(ctx context.Context, pushRequest *setting.PushMessageRequest) (*PushMessageResponse, error) {
+func (p *PushClient) PushNotice(ctx context.Context, pushRequest *setting.PushMessageRequest) (interface{}, error) {
 	errCheck := p.checkParam(pushRequest)
 	if errCheck != nil {
 		return nil, errCheck
@@ -204,7 +204,7 @@ func (p *PushClient) parseBody(body []byte) (*PushMessageResponse, error) {
 	return resp, nil
 }
 
-func (p *PushClient) GetAccessToken(ctx context.Context) (*AuthTokenResp, error) {
+func (p *PushClient) GetAccessToken(ctx context.Context) (interface{}, error) {
 
 	authTokenReq := &AuthTokenReq{
 		AppKey:       p.conf.AppKey,

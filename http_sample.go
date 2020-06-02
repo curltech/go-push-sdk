@@ -1,6 +1,12 @@
 package main
 
 import (
+	"gitee.com/cristiane/go-push-sdk/push/huawei_channel"
+	"gitee.com/cristiane/go-push-sdk/push/ios_channel"
+	"gitee.com/cristiane/go-push-sdk/push/meizu_channel"
+	"gitee.com/cristiane/go-push-sdk/push/oppo_channel"
+	"gitee.com/cristiane/go-push-sdk/push/vivo_channel"
+	"gitee.com/cristiane/go-push-sdk/push/xiaomi_channel"
 	"log"
 	"net/http"
 	"strings"
@@ -69,7 +75,7 @@ func main() {
 
 func huaweiAccessToken(c *gin.Context) {
 
-	huaweiClient, err := register.GetHuaweiClient()
+	huaweiClient, err := register.GetHUAWEIClient()
 	if err != nil {
 		log.Println("huawei get access_token err: ", err)
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -93,11 +99,11 @@ func huaweiAccessToken(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"success":           true,
-		"access_token":      accessTokenResp.AccessToken,
-		"expires":           accessTokenResp.ExpiresIn,
-		"error":             accessTokenResp.Error,
-		"scope":             accessTokenResp.Scope,
-		"error_description": accessTokenResp.ErrorDescription,
+		"access_token":      accessTokenResp.(*huawei_channel.AccessTokenResp).AccessToken,
+		"expires":           accessTokenResp.(*huawei_channel.AccessTokenResp).ExpiresIn,
+		"error":             accessTokenResp.(*huawei_channel.AccessTokenResp).Error,
+		"scope":             accessTokenResp.(*huawei_channel.AccessTokenResp).Scope,
+		"error_description": accessTokenResp.(*huawei_channel.AccessTokenResp).ErrorDescription,
 	})
 }
 
@@ -112,7 +118,7 @@ func huaweiPush(c *gin.Context) {
 	messageCallBack := c.PostForm("messageCallBack")
 	messageCallBackParam := c.PostForm("messageCallBackParam")
 	deviceAccessToken := c.PostForm("accessToken")
-	huaweiClient, err := register.GetHuaweiClient()
+	huaweiClient, err := register.GetHUAWEIClient()
 	if err != nil {
 		log.Println("huawei push get access_token err: ", err)
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -135,7 +141,7 @@ func huaweiPush(c *gin.Context) {
 			})
 			return
 		}
-		deviceAccessToken = accessTokenResp.AccessToken
+		deviceAccessToken = accessTokenResp.(*huawei_channel.AccessTokenResp).AccessToken
 	}
 
 	msg := &setting.PushMessageRequest{
@@ -175,9 +181,9 @@ func huaweiPush(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success":   true,
 		"reason":    "",
-		"code":      respPush.Code,
-		"msg":       respPush.Msg,
-		"requestId": respPush.RequestId,
+		"code":      respPush.(*huawei_channel.PushMessageResponse).Code,
+		"msg":       respPush.(*huawei_channel.PushMessageResponse).Msg,
+		"requestId": respPush.(*huawei_channel.PushMessageResponse).RequestId,
 	})
 }
 
@@ -233,9 +239,9 @@ func iphoneCert(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"success":     true,
-		"status_code": respPush.StatusCode,
-		"ap_ns_id":    respPush.APNsId,
-		"reason":      respPush.Reason,
+		"status_code": respPush.(*ios_channel.PushMessageResponse).StatusCode,
+		"ap_ns_id":    respPush.(*ios_channel.PushMessageResponse).APNsId,
+		"reason":      respPush.(*ios_channel.PushMessageResponse).Reason,
 	})
 }
 
@@ -292,9 +298,9 @@ func iphoneToken(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"success":     true,
-		"status_code": respPush.StatusCode,
-		"ap_ns_id":    respPush.APNsId,
-		"reason":      respPush.Reason,
+		"status_code": respPush.(*ios_channel.PushMessageResponse).StatusCode,
+		"ap_ns_id":    respPush.(*ios_channel.PushMessageResponse).APNsId,
+		"reason":      respPush.(*ios_channel.PushMessageResponse).Reason,
 	})
 }
 
@@ -334,7 +340,7 @@ func meizuPush(c *gin.Context) {
 		msg.Message.Extra = messageExtraMap
 	}
 
-	meizuClient, err := register.GetMeizuClient()
+	meizuClient, err := register.GetMEIZUClient()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -352,11 +358,11 @@ func meizuPush(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"success":  true,
-		"code":     respPush.Code,
-		"message":  respPush.Message,
-		"value":    respPush.Value,
-		"redirect": respPush.Redirect,
-		"msgId":    respPush.MsgId,
+		"code":     respPush.(*meizu_channel.PushMessageResponse).Code,
+		"message":  respPush.(*meizu_channel.PushMessageResponse).Message,
+		"value":    respPush.(*meizu_channel.PushMessageResponse).Value,
+		"redirect": respPush.(*meizu_channel.PushMessageResponse).Redirect,
+		"msgId":    respPush.(*meizu_channel.PushMessageResponse).MsgId,
 	})
 }
 
@@ -395,7 +401,7 @@ func xiaomiPush(c *gin.Context) {
 		}
 		msg.Message.Extra = messageExtraMap
 	}
-	xiaomiClient, err := register.GetXiaomiClient()
+	xiaomiClient, err := register.GetXIAOMIClient()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -413,12 +419,12 @@ func xiaomiPush(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"success":     true,
-		"result":      respPush.Result,
-		"description": respPush.Description,
-		"data":        respPush.Data,
-		"code":        respPush.Code,
-		"info":        respPush.Info,
-		"reason":      respPush.Reason,
+		"result":      respPush.(*xiaomi_channel.PushMessageResponse).Result,
+		"description": respPush.(*xiaomi_channel.PushMessageResponse).Description,
+		"data":        respPush.(*xiaomi_channel.PushMessageResponse).Data,
+		"code":        respPush.(*xiaomi_channel.PushMessageResponse).Code,
+		"info":        respPush.(*xiaomi_channel.PushMessageResponse).Info,
+		"reason":      respPush.(*xiaomi_channel.PushMessageResponse).Reason,
 	})
 }
 
@@ -441,9 +447,9 @@ func oppoAuthToken(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"code":    authTokenResp.Code,
-		"data":    json.MarshalToStringNoError(authTokenResp.Data),
-		"message": authTokenResp.Message,
+		"code":    authTokenResp.(*oppo_channel.AuthTokenResp).Code,
+		"data":    json.MarshalToStringNoError(authTokenResp.(*oppo_channel.AuthTokenResp).Data),
+		"message": authTokenResp.(*oppo_channel.AuthTokenResp).Message,
 	})
 }
 
@@ -475,7 +481,7 @@ func oppoPush(c *gin.Context) {
 			})
 			return
 		}
-		deviceAccessToken = authTokenResp.Data.AuthToken
+		deviceAccessToken = authTokenResp.(*oppo_channel.AuthTokenResp).Data.AuthToken
 	}
 	msg := &setting.PushMessageRequest{
 		DeviceTokens: strings.Split(deviceTokens, ","),
@@ -511,9 +517,9 @@ func oppoPush(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": respPush.Message,
-		"code":    respPush.Code,
-		"data":    json.MarshalToStringNoError(respPush.Data),
+		"message": respPush.(*oppo_channel.PushMessageResponse).Message,
+		"code":    respPush.(*oppo_channel.PushMessageResponse).Code,
+		"data":    json.MarshalToStringNoError(respPush.(*oppo_channel.PushMessageResponse).Data),
 	})
 }
 
@@ -536,9 +542,9 @@ func vivoAuthToken(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"success":    true,
-		"result":     authTokenResp.Result,
-		"auth_token": authTokenResp.AuthToken,
-		"desc":       authTokenResp.Desc,
+		"result":     authTokenResp.(*vivo_channel.AuthTokenResp).Result,
+		"auth_token": authTokenResp.(*vivo_channel.AuthTokenResp).AuthToken,
+		"desc":       authTokenResp.(*vivo_channel.AuthTokenResp).Desc,
 	})
 }
 
@@ -571,7 +577,7 @@ func vivoPush(c *gin.Context) {
 			})
 			return
 		}
-		deviceAccessToken = authTokenResp.AuthToken
+		deviceAccessToken = authTokenResp.(*vivo_channel.AuthTokenResp).AuthToken
 	}
 
 	msg := &setting.PushMessageRequest{
@@ -608,11 +614,11 @@ func vivoPush(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"success":       true,
-		"desc":          respPush.Desc,
-		"result":        respPush.Result,
-		"request_id":    respPush.RequestId,
-		"task_id":       respPush.TaskId,
-		"invalid_users": respPush.InvalidUsers,
+		"desc":          respPush.(*vivo_channel.PushMessageResponse).Desc,
+		"result":        respPush.(*vivo_channel.PushMessageResponse).Result,
+		"request_id":    respPush.(*vivo_channel.PushMessageResponse).RequestId,
+		"task_id":       respPush.(*vivo_channel.PushMessageResponse).TaskId,
+		"invalid_users": respPush.(*vivo_channel.PushMessageResponse).InvalidUsers,
 	})
 }
 

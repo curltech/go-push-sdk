@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 
+	"gitee.com/cristiane/go-push-sdk/push/common/convert"
 	"gitee.com/cristiane/go-push-sdk/push/common/file"
 	"gitee.com/cristiane/go-push-sdk/push/common/json"
 	"gitee.com/cristiane/go-push-sdk/push/errcode"
@@ -23,79 +24,99 @@ const (
 )
 
 type RegisterClient struct {
-	conf *setting.PushConfig
+	cfg interface{}
 }
 
 func NewRegisterClient(configFilePath string) (*RegisterClient, error) {
 	if configFilePath == "" {
-		return nil, errcode.ErrConfFileEmpty
+		return nil, errcode.ErrCfgFileEmpty
 	}
 	fileRead := file.NewFileRead()
 	jsonByte, err := fileRead.Read(configFilePath)
 	if err != nil {
 		log.Printf("[go-push-sdk] read conf file err: %v", err)
-		return nil, errcode.ErrParseSettingFile
+		return nil, errcode.ErrParseCfgFile
 	}
 
-	conf := &setting.PushConfig{}
-	err = json.UnmarshalByte(jsonByte, conf)
-	if err != nil {
-		log.Printf("[go-push-sdk] parse conf file err: %v", err)
-		return nil, errcode.ErrParseSettingFile
-	}
-
-	return &RegisterClient{
-		conf: conf,
-	}, nil
+	return NewRegisterClientWithConf(convert.Byte2Str(jsonByte))
 }
 
-func NewRegisterClientWithConf(jsonData string) (*RegisterClient, error) {
-	if jsonData == "" {
+func newRegisterClient(cfgJson string, obj interface{}) (*RegisterClient, error) {
+	if cfgJson == "" {
 		return nil, errors.New("jsonData is nil")
 	}
-	conf := &setting.PushConfig{}
-	err := json.Unmarshal(jsonData, conf)
+	err := json.Unmarshal(cfgJson, obj)
 	if err != nil {
 		log.Printf("[go-push-sdk] parse json conf err: %v", err)
-		return nil, errcode.ErrParseSettingFile
+		return nil, errcode.ErrParseCfgFile
 	}
 
 	return &RegisterClient{
-		conf: conf,
+		cfg: obj,
 	}, nil
 }
 
-func (r *RegisterClient) GetHuaweiClient() (*huawei_channel.PushClient, error) {
-
-	return huawei_channel.NewPushClient(r.conf.HUAWEI)
+func NewRegisterClientWithConf(cfgJson string) (*RegisterClient, error) {
+	obj := &setting.PushConfig{}
+	return newRegisterClient(cfgJson, obj)
 }
 
-func (r *RegisterClient) GetMeizuClient() (*meizu_channel.PushClient, error) {
-
-	return meizu_channel.NewPushClient(r.conf.MEIZU)
+func (r *RegisterClient) GetPlatformClient(platform string) (setting.PushClientInterface, error) {
+	if platform == "huawei" {
+		return r.GetHUAWEIClient()
+	}
+	if platform == "meizu" {
+		return r.GetMEIZUClient()
+	}
+	if platform == "oppo" {
+		return r.GetOPPOClient()
+	}
+	if platform == "vivo" {
+		return r.GetVIVOClient()
+	}
+	if platform == "xiaomi" {
+		return r.GetXIAOMIClient()
+	}
+	if platform == "ios" {
+		return r.GetIosCertClient()
+	}
+	if platform == "ios-token" {
+		return r.GetIosTokenClient()
+	}
+	return nil, errors.New("UNKNOWN REGISTER PLATFORM ？")
 }
 
-func (r *RegisterClient) GetXiaomiClient() (*xiaomi_channel.PushClient, error) {
+func (r *RegisterClient) GetHUAWEIClient() (setting.PushClientInterface, error) {
 
-	return xiaomi_channel.NewPushClient(r.conf.XIAOMI)
+	return huawei_channel.NewPushClient(r.cfg.(*setting.PushConfig).HUAWEI)
 }
 
-func (r *RegisterClient) GetOPPOClient() (*oppo_channel.PushClient, error) {
+func (r *RegisterClient) GetMEIZUClient() (setting.PushClientInterface, error) {
 
-	return oppo_channel.NewPushClient(r.conf.OPPO)
+	return meizu_channel.NewPushClient(r.cfg.(*setting.PushConfig).MEIZU)
 }
 
-func (r *RegisterClient) GetVIVOClient() (*vivo_channel.PushClient, error) {
+func (r *RegisterClient) GetXIAOMIClient() (setting.PushClientInterface, error) {
 
-	return vivo_channel.NewPushClient(r.conf.VIVO)
+	return xiaomi_channel.NewPushClient(r.cfg.(*setting.PushConfig).XIAOMI)
 }
 
-func (r *RegisterClient) GetIosCertClient() (*cert_channel.PushClient, error) {
+func (r *RegisterClient) GetOPPOClient() (setting.PushClientInterface, error) {
 
-	return cert_channel.NewPushClient(r.conf.IOS_CERT)
+	return oppo_channel.NewPushClient(r.cfg.(*setting.PushConfig).OPPO)
 }
 
-func (r *RegisterClient) GetIosTokenClient() (*token_channel.PushClient, error) {
+func (r *RegisterClient) GetVIVOClient() (setting.PushClientInterface, error) {
 
-	return token_channel.NewPushClient(r.conf.IOS_TOKEN)
+	return vivo_channel.NewPushClient(r.cfg.(*setting.PushConfig).VIVO)
+}
+
+func (r *RegisterClient) GetIosCertClient() (setting.PushClientInterface, error) {
+
+	return cert_channel.NewPushClient(r.cfg.(*setting.PushConfig).IOS_CERT)
+}
+
+func (r *RegisterClient) GetIosTokenClient() (setting.PushClientInterface, error) {
+
+	return token_channel.NewPushClient(r.cfg.(*setting.PushConfig).IOS_TOKEN)
 }

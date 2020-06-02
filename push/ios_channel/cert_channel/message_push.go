@@ -23,7 +23,7 @@ type PushClient struct {
 	conf *setting.IOS_CERT
 }
 
-func NewPushClient(conf *setting.IOS_CERT) (*PushClient, error) {
+func NewPushClient(conf *setting.IOS_CERT) (setting.PushClientInterface, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -77,7 +77,7 @@ func checkConf(conf *setting.IOS_CERT) error {
 	return nil
 }
 
-func (p *PushClient) PushNotice(ctx context.Context, pushRequest *setting.PushMessageRequest) (*ios_channel.PushMessageResponse, error) {
+func (p *PushClient) PushNotice(ctx context.Context, pushRequest *setting.PushMessageRequest) (interface{}, error) {
 	errCheck := p.checkParam(pushRequest)
 	if errCheck != nil {
 		return nil, errCheck
@@ -103,7 +103,7 @@ func (p *PushClient) checkParam(pushRequest *setting.PushMessageRequest) error {
 	return nil
 }
 
-func (p *PushClient) GetAccessToken() (interface{}, error) {
+func (p *PushClient) GetAccessToken(ctx context.Context) (interface{}, error) {
 
 	return nil, nil
 }

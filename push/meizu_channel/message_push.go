@@ -29,7 +29,7 @@ type PushClient struct {
 	conf       *setting.MEIZU
 }
 
-func NewPushClient(conf *setting.MEIZU) (*PushClient, error) {
+func NewPushClient(conf *setting.MEIZU) (setting.PushClientInterface, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -53,7 +53,7 @@ func checkConf(conf *setting.MEIZU) error {
 	return nil
 }
 
-func (p *PushClient) PushNotice(ctx context.Context, pushRequest *setting.PushMessageRequest) (*PushMessageResponse, error) {
+func (p *PushClient) PushNotice(ctx context.Context, pushRequest *setting.PushMessageRequest) (interface{}, error) {
 	errCheck := p.checkParam(pushRequest)
 	if errCheck != nil {
 		return nil, errCheck
@@ -150,7 +150,7 @@ func (p *PushClient) checkParam(pushRequest *setting.PushMessageRequest) error {
 	return nil
 }
 
-func (p *PushClient) GetAccessToken() (interface{}, error) {
+func (p *PushClient) GetAccessToken(ctx context.Context) (interface{}, error) {
 
 	return nil, nil
 }
