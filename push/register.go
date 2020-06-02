@@ -88,7 +88,7 @@ func (r *RegisterClient) GetPlatformClient(platform setting.PlatformType) (setti
 
 func (r *RegisterClient) GetHUAWEIClient() (setting.PushClientInterface, error) {
 
-	return huawei_channel.NewPushClient(r.cfg.(setting.PushConfig).HUAWEI)
+	return huawei_channel.NewPushClient(r.cfg.(*setting.PushConfig).HUAWEI)
 }
 
 func (r *RegisterClient) GetMEIZUClient() (setting.PushClientInterface, error) {
