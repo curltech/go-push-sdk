@@ -4,7 +4,7 @@ import "errors"
 
 // 错误定义
 var (
-	ErrConfFileEmpty       = errors.New("conf file empty")             // 推送超时
+	ErrCfgFileEmpty        = errors.New("conf file empty")             // 推送超时
 	ErrClientIdEmpty       = errors.New("ClientId Empty")              // 客户端ID为空
 	ErrClientSecretEmpty   = errors.New("ClientSecret Empty")          // 客户端秘钥为空
 	ErrAppSecretEmpty      = errors.New("AppSecret Empty")             // 秘钥为空
@@ -26,5 +26,5 @@ var (
 	ErrKeyIdEmpty          = errors.New("KeyId Empty")
 	ErrSecretFileEmpty     = errors.New("SecretFile Empty")
 	ErrBundleIdEmpty       = errors.New("BundleId Empty")
-	ErrParseSettingFile    = errors.New("Parse setting.json file error")
+	ErrParseCfgFile        = errors.New("Parse setting.json file error")
 )

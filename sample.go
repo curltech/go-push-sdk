@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	register, err := push.NewRegisterClientWithConf("...json conf data...")
+	register, err := push.NewRegisterClient(push.DefaultConfFile)
 	if err != nil {
 		fmt.Printf("NewRegisterClient err: %v", err)
 		return

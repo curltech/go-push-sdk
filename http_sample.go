@@ -69,7 +69,7 @@ func main() {
 
 func huaweiAccessToken(c *gin.Context) {
 
-	huaweiClient, err := register.GetHuaweiClient()
+	huaweiClient, err := register.GetHUAWEIClient()
 	if err != nil {
 		log.Println("huawei get access_token err: ", err)
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -112,7 +112,7 @@ func huaweiPush(c *gin.Context) {
 	messageCallBack := c.PostForm("messageCallBack")
 	messageCallBackParam := c.PostForm("messageCallBackParam")
 	deviceAccessToken := c.PostForm("accessToken")
-	huaweiClient, err := register.GetHuaweiClient()
+	huaweiClient, err := register.GetHUAWEIClient()
 	if err != nil {
 		log.Println("huawei push get access_token err: ", err)
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -334,7 +334,7 @@ func meizuPush(c *gin.Context) {
 		msg.Message.Extra = messageExtraMap
 	}
 
-	meizuClient, err := register.GetMeizuClient()
+	meizuClient, err := register.GetMEIZUClient()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -395,7 +395,7 @@ func xiaomiPush(c *gin.Context) {
 		}
 		msg.Message.Extra = messageExtraMap
 	}
-	xiaomiClient, err := register.GetXiaomiClient()
+	xiaomiClient, err := register.GetXIAOMIClient()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
