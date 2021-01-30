@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
@@ -43,8 +42,7 @@ func (a *AuthToken) parseBody(body []byte) (*AuthTokenResp, error) {
 	resp := &AuthTokenResp{}
 	err := json.Unmarshal(body, resp)
 	if err != nil {
-		log.Printf("[go-push-sdk] oppo auth token parseBody err: %v", err)
-		return nil, errcode.ErrParseBody
+		return nil, errcode.ErrOppoParseBody
 	}
 
 	return resp, nil
@@ -52,10 +50,10 @@ func (a *AuthToken) parseBody(body []byte) (*AuthTokenResp, error) {
 
 func (a *AuthToken) checkRequest(request *AuthTokenReq) error {
 	if request.AppKey == "" {
-		return errcode.ErrAppKeyEmpty
+		return errcode.ErrOppoAppKeyEmpty
 	}
 	if request.MasterSecret == "" {
-		return errcode.ErrMasterSecretEmpty
+		return errcode.ErrOppoMasterSecretEmpty
 	}
 	return nil
 }

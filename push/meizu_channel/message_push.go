@@ -3,7 +3,6 @@ package meizu_channel
 import (
 	"context"
 	"fmt"
-	"log"
 	"sort"
 	"strings"
 
@@ -26,10 +25,10 @@ const (
 
 type PushClient struct {
 	httpClient *http.Client
-	conf       setting.MEIZU
+	conf       setting.ConfigMeizu
 }
 
-func NewPushClient(conf setting.MEIZU) (setting.PushClientInterface, error) {
+func NewPushClient(conf setting.ConfigMeizu) (setting.PushClientInterface, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -40,15 +39,15 @@ func NewPushClient(conf setting.MEIZU) (setting.PushClientInterface, error) {
 	}, nil
 }
 
-func checkConf(conf setting.MEIZU) error {
+func checkConf(conf setting.ConfigMeizu) error {
 	if conf.AppPkgName == "" {
-		return errcode.ErrAppPkgNameEmpty
+		return errcode.ErrMeizuAppPkgNameEmpty
 	}
 	if conf.AppId == "" {
-		return errcode.ErrAppIdEmpty
+		return errcode.ErrMeizuAppIdEmpty
 	}
 	if conf.AppSecret == "" {
-		return errcode.ErrAppSecretEmpty
+		return errcode.ErrMeizuAppSecretEmpty
 	}
 	return nil
 }
@@ -133,8 +132,7 @@ func (p *PushClient) parseBody(body []byte) (*PushMessageResponse, error) {
 	resp := &PushMessageResponse{}
 	err := json.UnmarshalByte(body, resp)
 	if err != nil {
-		log.Printf("[go-push-sdk] meizu message push parseBody err: %v", err)
-		return nil, err
+		return nil, errcode.ErrMeizuParseBody
 	}
 	return resp, nil
 }

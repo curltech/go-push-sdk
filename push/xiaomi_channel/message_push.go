@@ -3,7 +3,6 @@ package xiaomi_channel
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/url"
 	"strconv"
 	"strings"
@@ -29,10 +28,10 @@ const (
 
 type PushClient struct {
 	httpClient *http.Client
-	conf       setting.XIAOMI
+	conf       setting.ConfigXiaomi
 }
 
-func NewPushClient(conf setting.XIAOMI) (setting.PushClientInterface, error) {
+func NewPushClient(conf setting.ConfigXiaomi) (setting.PushClientInterface, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -43,12 +42,12 @@ func NewPushClient(conf setting.XIAOMI) (setting.PushClientInterface, error) {
 	}, nil
 }
 
-func checkConf(conf setting.XIAOMI) error {
+func checkConf(conf setting.ConfigXiaomi) error {
 	if conf.AppPkgName == "" {
-		return errcode.ErrAppPkgNameEmpty
+		return errcode.ErrXiaomiAppPkgNameEmpty
 	}
 	if conf.AppSecret == "" {
-		return errcode.ErrAppSecretEmpty
+		return errcode.ErrXiaomiAppSecretEmpty
 	}
 	return nil
 }
@@ -109,8 +108,7 @@ func (p *PushClient) parseBody(body []byte) (*PushMessageResponse, error) {
 	resp := &PushMessageResponse{}
 	err := json.UnmarshalByte(body, resp)
 	if err != nil {
-		log.Printf("[go-push-sdk] xiaomi message push parseBody err: %v", err)
-		return nil, errcode.ErrParseBody
+		return nil, errcode.ErrXiaomiParseBody
 	}
 	return resp, nil
 }

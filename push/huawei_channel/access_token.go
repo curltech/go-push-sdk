@@ -3,8 +3,6 @@ package huawei_channel
 import (
 	"context"
 	"encoding/json"
-	"log"
-
 	"gitee.com/cristiane/go-push-sdk/push/common/http"
 	"gitee.com/cristiane/go-push-sdk/push/errcode"
 )
@@ -40,18 +38,17 @@ func (a *AccessToken) parseBody(body []byte) (*AccessTokenResp, error) {
 	resp := &AccessTokenResp{}
 	err := json.Unmarshal(body, resp)
 	if err != nil {
-		log.Printf("[go-push-sdk] huawei access token  parseBody err: %v", err)
-		return nil, errcode.ErrParseBody
+		return nil, errcode.ErrHuaweiParseBody
 	}
 	return resp, nil
 }
 
 func (a *AccessToken) checkRequest(request *AccessTokenReq) error {
 	if request.ClientId == "" {
-		return errcode.ErrClientIdEmpty
+		return errcode.ErrHuaweiClientIdEmpty
 	}
 	if request.ClientSecret == "" {
-		return errcode.ErrClientSecretEmpty
+		return errcode.ErrHuaweiClientSecretEmpty
 	}
 
 	return nil

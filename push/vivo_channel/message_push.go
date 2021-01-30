@@ -3,7 +3,6 @@ package vivo_channel
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"gitee.com/cristiane/go-push-sdk/push/common/http"
@@ -26,11 +25,11 @@ const (
 
 type PushClient struct {
 	httpClient *http.Client
-	conf       setting.VIVO
+	conf       setting.ConfigVivo
 	authClient *AuthToken
 }
 
-func NewPushClient(conf setting.VIVO) (setting.PushClientInterface, error) {
+func NewPushClient(conf setting.ConfigVivo) (setting.PushClientInterface, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -42,18 +41,18 @@ func NewPushClient(conf setting.VIVO) (setting.PushClientInterface, error) {
 	}, nil
 }
 
-func checkConf(conf setting.VIVO) error {
+func checkConf(conf setting.ConfigVivo) error {
 	if conf.AppPkgName == "" {
-		return errcode.ErrAppPkgNameEmpty
+		return errcode.ErrVivoAppPkgNameEmpty
 	}
 	if conf.AppId == "" {
-		return errcode.ErrAppIdEmpty
+		return errcode.ErrVivoAppIdEmpty
 	}
 	if conf.AppKey == "" {
-		return errcode.ErrAppKeyEmpty
+		return errcode.ErrVivoAppKeyEmpty
 	}
 	if conf.AppSecret == "" {
-		return errcode.ErrAppSecretEmpty
+		return errcode.ErrVivoAppSecretEmpty
 	}
 
 	return nil
@@ -72,8 +71,7 @@ func (p *PushClient) parseBody(body []byte) (*PushMessageResponse, error) {
 	resp := &PushMessageResponse{}
 	err := json.UnmarshalByte(body, resp)
 	if err != nil {
-		log.Printf("[go-push-sdk] vivo message push parseBody err: %v", err)
-		return nil, errcode.ErrParseBody
+		return nil, errcode.ErrVivoParseBody
 	}
 	return resp, nil
 }
@@ -174,8 +172,7 @@ func (p *PushClient) saveMessageToCloud(ctx context.Context, pushRequest *settin
 	saveResult := &SaveMessageToCloudResponse{}
 	errParse := json.UnmarshalByte(body, saveResult)
 	if errParse != nil {
-		log.Printf("[go-push-sdk] vivo message push parse saveMessage body err: %v", errParse)
-		return "", errcode.ErrParseBody
+		return "", errcode.ErrVivoParseBody
 	}
 
 	return saveResult.TaskId, nil

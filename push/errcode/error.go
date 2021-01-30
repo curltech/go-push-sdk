@@ -1,31 +1,49 @@
 package errcode
 
-import "errors"
+import (
+	"fmt"
+)
 
-// 错误定义
+const (
+	tempErr = "\u001B[34m[go-push-sdk]\u001B[0m: \x1b[31m%v\x1b[0m\n"
+)
+
 var (
-	ErrCfgFileEmpty        = errors.New("[go-push-sdk] conf file empty")             // 推送超时
-	ErrClientIdEmpty       = errors.New("[go-push-sdk] ClientId Empty")              // 客户端ID为空
-	ErrClientSecretEmpty   = errors.New("[go-push-sdk] ClientSecret Empty")          // 客户端秘钥为空
-	ErrAppSecretEmpty      = errors.New("[go-push-sdk] AppSecret Empty")             // 秘钥为空
-	ErrAppPkgNameEmpty     = errors.New("[go-push-sdk] AppPkgName Empty")            // 应用包名为空
-	ErrAccessTokenEmpty    = errors.New("[go-push-sdk] accessToken Empty")           // access_token为空
-	ErrMessageTitleEmpty   = errors.New("[go-push-sdk] message title empty")         // 消息标题为空
-	ErrMessageContentEmpty = errors.New("[go-push-sdk] message content empty")       // 消息内容为空
-	ErrDeviceTokenMax      = errors.New("[go-push-sdk] device token max limited")    // 推送设备超过最大限制
-	ErrDeviceTokenMin      = errors.New("[go-push-sdk] device token min limited")    // 推送设备超过最小限制
-	ErrAppIdEmpty          = errors.New("[go-push-sdk] AppId Empty")                 // 应用ID为空
-	ErrAppKeyEmpty         = errors.New("[go-push-sdk] AppKey Empty")                // 应用KEY为空
-	ErrMasterSecretEmpty   = errors.New("[go-push-sdk] MasterSecret Empty")          // 应用MasterSecret为空
-	ErrSaveMessageToCloud  = errors.New("[go-push-sdk] Save Message to Cloud error") // 推送消息错误
-	ErrBusinessIdEmpty     = errors.New("[go-push-sdk] BusinessId Empty")            // 业务ID为空
-	ErrParseBody           = errors.New("[go-push-sdk] parse response body error")   // 解析响应体错误
-	ErrCertPathEmpty       = errors.New("[go-push-sdk] CertPath Empty")              // CertPath 为空
-	ErrPasswordEmpty       = errors.New("[go-push-sdk] PassWord Empty")              // Password 为空
-	ErrTeamIdEmpty         = errors.New("[go-push-sdk] TeamId Empty")
-	ErrKeyIdEmpty          = errors.New("[go-push-sdk] KeyId Empty")
-	ErrSecretFileEmpty     = errors.New("[go-push-sdk] SecretFile Empty")
-	ErrBundleIdEmpty       = errors.New("[go-push-sdk] BundleId Empty")
-	ErrParseCfgFile        = errors.New("[go-push-sdk] Parse setting.json file error")
-	ErrUnknownPlatform     = errors.New("[go-push-sdk] unknown platform ")
+	ErrCfgFileEmpty            = fmt.Errorf(tempErr, "conf file empty")
+	ErrHuaweiClientIdEmpty     = fmt.Errorf(tempErr, "huawei clientId Empty")
+	ErrHuaweiClientSecretEmpty = fmt.Errorf(tempErr, "huawei clientSecret Empty")
+	ErrXiaomiAppSecretEmpty    = fmt.Errorf(tempErr, "xiaomi appSecret Empty")
+	ErrVivoAppSecretEmpty      = fmt.Errorf(tempErr, "vivo appSecret Empty")
+	ErrMeizuAppSecretEmpty     = fmt.Errorf(tempErr, "meizu appSecret Empty")
+	ErrXiaomiAppPkgNameEmpty   = fmt.Errorf(tempErr, "xiaomi appPkgName Empty")
+	ErrVivoAppPkgNameEmpty     = fmt.Errorf(tempErr, "vivo appPkgName Empty")
+	ErrOppoAppPkgNameEmpty     = fmt.Errorf(tempErr, "oppo appPkgName Empty")
+	ErrMeizuAppPkgNameEmpty    = fmt.Errorf(tempErr, "meizu appPkgName Empty")
+	ErrHuaweiAppPkgNameEmpty   = fmt.Errorf(tempErr, "huawei appPkgName Empty")
+	ErrAccessTokenEmpty        = fmt.Errorf(tempErr, "accessToken Empty")
+	ErrMessageTitleEmpty       = fmt.Errorf(tempErr, "message title empty")
+	ErrMessageContentEmpty     = fmt.Errorf(tempErr, "message content empty")
+	ErrDeviceTokenMax          = fmt.Errorf(tempErr, "device token max limited")
+	ErrDeviceTokenMin          = fmt.Errorf(tempErr, "device token min limited")
+	ErrVivoAppIdEmpty          = fmt.Errorf(tempErr, "vivo appId Empty")
+	ErrMeizuAppIdEmpty         = fmt.Errorf(tempErr, "meizu appId Empty")
+	ErrVivoAppKeyEmpty         = fmt.Errorf(tempErr, "vivo appKey Empty")
+	ErrOppoAppKeyEmpty         = fmt.Errorf(tempErr, "oppo appKey Empty")
+	ErrOppoMasterSecretEmpty   = fmt.Errorf(tempErr, "oppo masterSecret Empty")
+	ErrOppoSaveMessageToCloud  = fmt.Errorf(tempErr, "oppo save Message to Cloud error")
+	ErrBusinessIdEmpty         = fmt.Errorf(tempErr, "businessId Empty")
+	ErrXiaomiParseBody         = fmt.Errorf(tempErr, "xiaomi parse response body error")
+	ErrVivoParseBody           = fmt.Errorf(tempErr, "vivo parse response body error")
+	ErrOppoParseBody           = fmt.Errorf(tempErr, "oppo parse response body error")
+	ErrMeizuParseBody          = fmt.Errorf(tempErr, "meizu parse response body error")
+	ErrHuaweiParseBody         = fmt.Errorf(tempErr, "huawei parse response body error")
+	ErrIosCertPathEmpty        = fmt.Errorf(tempErr, "ios certPath Empty")
+	ErrIosPasswordEmpty        = fmt.Errorf(tempErr, "ios passWord Empty")
+	ErrIosTeamIdEmpty          = fmt.Errorf(tempErr, "ios teamId Empty")
+	ErrIosKeyIdEmpty           = fmt.Errorf(tempErr, "ios keyId Empty")
+	ErrIosSecretFileEmpty      = fmt.Errorf(tempErr, "ios secretFile Empty")
+	ErrIosBundleIdEmpty        = fmt.Errorf(tempErr, "ios bundleId Empty")
+	ErrUnknownPlatform         = fmt.Errorf(tempErr, "unknown platform ")
+	ErrParseConfigFile         = fmt.Errorf(tempErr, "parse config file err")
+	ErrConfigEmpty             = fmt.Errorf(tempErr, "config file null")
 )

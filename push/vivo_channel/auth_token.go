@@ -3,8 +3,6 @@ package vivo_channel
 import (
 	"context"
 	"fmt"
-	"gitee.com/cristiane/go-push-sdk/push/common/convert"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -73,8 +71,7 @@ func (a *AuthToken) parseBody(body []byte) (*AuthTokenResp, error) {
 	resp := &AuthTokenResp{}
 	err := json.UnmarshalByte(body, resp)
 	if err != nil {
-		log.Printf("[go-push-sdk] vivo message push parseBody err: %v, body: %v", err, convert.Byte2Str(body))
-		return nil, errcode.ErrParseBody
+		return nil, errcode.ErrVivoParseBody
 	}
 
 	return resp, nil
@@ -82,13 +79,13 @@ func (a *AuthToken) parseBody(body []byte) (*AuthTokenResp, error) {
 
 func (a *AuthToken) checkRequest(request *AuthTokenReq) error {
 	if request.AppId == "" {
-		return errcode.ErrAppIdEmpty
+		return errcode.ErrVivoAppIdEmpty
 	}
 	if request.AppKey == "" {
-		return errcode.ErrAppKeyEmpty
+		return errcode.ErrVivoAppKeyEmpty
 	}
 	if request.AppSecret == "" {
-		return errcode.ErrAppSecretEmpty
+		return errcode.ErrVivoAppSecretEmpty
 	}
 	return nil
 }

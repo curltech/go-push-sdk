@@ -20,10 +20,10 @@ const (
 )
 
 type PushClient struct {
-	conf setting.IOS_TOKEN
+	conf setting.ConfigIosToken
 }
 
-func NewPushClient(conf setting.IOS_TOKEN) (setting.PushClientInterface, error) {
+func NewPushClient(conf setting.ConfigIosToken) (setting.PushClientInterface, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -33,18 +33,18 @@ func NewPushClient(conf setting.IOS_TOKEN) (setting.PushClientInterface, error) 
 	}, nil
 }
 
-func checkConf(conf setting.IOS_TOKEN) error {
+func checkConf(conf setting.ConfigIosToken) error {
 	if conf.TeamId == "" {
-		return errcode.ErrTeamIdEmpty
+		return errcode.ErrIosTeamIdEmpty
 	}
 	if conf.KeyId == "" {
-		return errcode.ErrKeyIdEmpty
+		return errcode.ErrIosKeyIdEmpty
 	}
 	if conf.SecretFile == "" {
-		return errcode.ErrSecretFileEmpty
+		return errcode.ErrIosSecretFileEmpty
 	}
 	if conf.BundleId == "" {
-		return errcode.ErrBundleIdEmpty
+		return errcode.ErrIosBundleIdEmpty
 	}
 	return nil
 }

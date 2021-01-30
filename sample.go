@@ -14,20 +14,13 @@ func main() {
 		fmt.Printf("NewRegisterClient err: %v", err)
 		return
 	}
-	huaweiClient, err := register.GetHUAWEIClient()
+	iosTokenClient, err := register.GetIosTokenClient()
 	if err != nil {
 		fmt.Printf("GetIosClient err: %v", err)
 		return
 	}
-	//resp, err := huaweiClient.GetAccessToken(context.Background())
-	//if err != nil {
-	//	fmt.Printf("GetAccessToken err: %v", err)
-	//	return
-	//}
-	//token := resp.(*huawei_channel.AccessTokenResp).AccessToken
-	//log.Println("token==", token)
 	var deviceTokens = []string{
-		"AL8xAEeqhZFah9hMpnL9mqNz9Quf1bDfIEQ0yhrwrLgLFwwNehHz3VlKPzTunXJP6V1kuxVUOVu_E8hIFaUWxOPD1THjyLLfDxkBy3InSXoKqHQA689CkQQjFSwBHxJVWw",
+		"58fb0a845812c3516819cd24ba50e237c388d6fbfde21fb997e8eeb725066d35",
 	}
 	msg := &setting.PushMessageRequest{
 		AccessToken:  "CV7WMbw6a/hcGdN0YNjHj4RdOYLYHSuRPbMii8Abzg8/kpqSDsaY9GE0P8uDc6Qz0ffuUjbPfo/DMJmGGDaIgYMLiofo",
@@ -47,7 +40,7 @@ func main() {
 		},
 	}
 	ctx := context.Background()
-	respPush, err := huaweiClient.PushNotice(ctx, msg)
+	respPush, err := iosTokenClient.PushNotice(ctx, msg)
 	if err != nil {
 		fmt.Printf("ios push err: %v", err)
 		return

@@ -2,7 +2,6 @@ package huawei_channel
 
 import (
 	"context"
-	"log"
 	"net/url"
 	"strconv"
 	"strings"
@@ -30,12 +29,12 @@ const (
 )
 
 type PushClient struct {
-	conf       setting.HUAWEI
+	conf       setting.ConfigHuawei
 	httpClient *http.Client
 	authClient *AccessToken
 }
 
-func NewPushClient(conf setting.HUAWEI) (setting.PushClientInterface, error) {
+func NewPushClient(conf setting.ConfigHuawei) (setting.PushClientInterface, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -47,15 +46,15 @@ func NewPushClient(conf setting.HUAWEI) (setting.PushClientInterface, error) {
 	}, nil
 }
 
-func checkConf(conf setting.HUAWEI) error {
+func checkConf(conf setting.ConfigHuawei) error {
 	if conf.AppPkgName == "" {
-		return errcode.ErrAppPkgNameEmpty
+		return errcode.ErrHuaweiAppPkgNameEmpty
 	}
 	if conf.ClientId == "" {
-		return errcode.ErrClientIdEmpty
+		return errcode.ErrHuaweiClientIdEmpty
 	}
 	if conf.ClientSecret == "" {
-		return errcode.ErrClientSecretEmpty
+		return errcode.ErrHuaweiClientSecretEmpty
 	}
 
 	return nil
@@ -140,8 +139,7 @@ func (p *PushClient) parseBody(body []byte) (*PushMessageResponse, error) {
 	resp := &PushMessageResponse{}
 	err := json.UnmarshalByte(body, resp)
 	if err != nil {
-		log.Printf("[go-push-sdk] huawei parseBody err: %v", err)
-		return nil, errcode.ErrParseBody
+		return nil, errcode.ErrHuaweiParseBody
 	}
 	return resp, nil
 }

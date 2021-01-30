@@ -2,9 +2,7 @@ package oppo_channel
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -31,11 +29,11 @@ const (
 
 type PushClient struct {
 	httpClient *http.Client
-	conf       setting.OPPO
+	conf       setting.ConfigOppo
 	authClient *AuthToken
 }
 
-func NewPushClient(conf setting.OPPO) (setting.PushClientInterface, error) {
+func NewPushClient(conf setting.ConfigOppo) (setting.PushClientInterface, error) {
 	errCheck := checkConf(conf)
 	if errCheck != nil {
 		return nil, errCheck
@@ -47,15 +45,15 @@ func NewPushClient(conf setting.OPPO) (setting.PushClientInterface, error) {
 	}, nil
 }
 
-func checkConf(conf setting.OPPO) error {
+func checkConf(conf setting.ConfigOppo) error {
 	if conf.AppPkgName == "" {
-		return errcode.ErrAppPkgNameEmpty
+		return errcode.ErrOppoAppPkgNameEmpty
 	}
 	if conf.AppKey == "" {
-		return errcode.ErrAppKeyEmpty
+		return errcode.ErrOppoAppKeyEmpty
 	}
 	if conf.MasterSecret == "" {
-		return errcode.ErrMasterSecretEmpty
+		return errcode.ErrOppoMasterSecretEmpty
 	}
 
 	return nil
@@ -98,7 +96,7 @@ func (p *PushClient) pushGateWay(ctx context.Context, pushRequest *setting.PushM
 			return nil, err
 		}
 		if messageId == "" {
-			return nil, errcode.ErrSaveMessageToCloud
+			return nil, errcode.ErrOppoSaveMessageToCloud
 		}
 		body, err := p.pushBroadcast(ctx, messageId, pushRequest)
 		return body, err
@@ -140,11 +138,10 @@ func (p *PushClient) saveMessageToCloud(ctx context.Context, authToken string, m
 	result := &SaveMessageToCloudResponse{}
 	errParse := json.UnmarshalByte(body, result)
 	if errParse != nil {
-		log.Printf("parse saveMessageToCloud Response err: %v", errParse)
-		return "", errcode.ErrParseBody
+		return "", errcode.ErrOppoParseBody
 	}
 	if result.Code == 11 {
-		return "", errors.New(result.Message)
+		return "", errcode.ErrOppoParseBody
 	}
 
 	return result.Data.MessageId, nil
@@ -197,8 +194,7 @@ func (p *PushClient) parseBody(body []byte) (*PushMessageResponse, error) {
 	resp := &PushMessageResponse{}
 	err := json.UnmarshalByte(body, resp)
 	if err != nil {
-		log.Printf("[go-push-sdk] oppo message push parseBody err: %v", err)
-		return nil, errcode.ErrParseBody
+		return nil, errcode.ErrOppoParseBody
 	}
 
 	return resp, nil

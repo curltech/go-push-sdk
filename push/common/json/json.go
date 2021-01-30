@@ -1,14 +1,14 @@
 package json
 
 import (
-	"errors"
-	jsoniter "github.com/json-iterator/go"
+	"fmt"
 	"gitee.com/cristiane/go-push-sdk/push/common/convert"
+	jsoniter "github.com/json-iterator/go"
 )
 
 func Marshal(v interface{}) ([]byte, error) {
 	if v == nil {
-		return nil, errors.New("invalid memory address or nil pointer dereference")
+		return nil,fmt.Errorf("\u001B[34m%v\u001B[0m: \x1b[31m%v\x1b[0m\n", "[go-push-sdk]", "invalid memory address or nil pointer dereference")
 	}
 	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 	return json.Marshal(v)
