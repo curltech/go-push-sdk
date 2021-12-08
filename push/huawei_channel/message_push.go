@@ -106,7 +106,7 @@ func (p *PushClient) buildMessage(pushRequest *setting.PushMessageRequest) map[s
 					Title:   pushRequest.Message.Title,
 				},
 				Action: &Action{
-					Type: typeActionCustom,
+					Type: typeActionOpenApp,
 					Param: &Param{
 						AppPkgName: p.conf.AppPkgName,
 						Intent:     intent.GenerateIntent(p.conf.AppPkgName, pushRequest.Message.Extra),
