@@ -21,6 +21,8 @@ const (
 	actionSinglePush  = "message/send"
 	actionSaveMessage = "message/saveListPayload"
 	actionMultiPush   = "message/pushToList"
+	skipTypeOne       = 1 // App launch page
+	skipTypeFour      = 4 // App specific page
 )
 
 type PushClient struct {
@@ -147,7 +149,7 @@ func (p *PushClient) saveMessageToCloud(ctx context.Context, pushRequest *settin
 	saveMessageToCloud := &SaveMessageToCloud{
 		Title:       pushRequest.Message.Title,
 		Content:     pushRequest.Message.Content,
-		SkipType:    4,
+		SkipType:    skipTypeOne,
 		SkipContent: intent.GenerateIntent(p.conf.AppPkgName, pushRequest.Message.Extra),
 		RequestId:   pushRequest.Message.BusinessId,
 		NotifyType:  1,
@@ -184,7 +186,7 @@ func (p *PushClient) pushSingleNotify(ctx context.Context, pushRequest *setting.
 		RegId:       strings.Join(pushRequest.DeviceTokens, ","),
 		Title:       pushRequest.Message.Title,
 		Content:     pushRequest.Message.Content,
-		SkipType:    4,
+		SkipType:    skipTypeOne,
 		SkipContent: intent.GenerateIntent(p.conf.AppPkgName, pushRequest.Message.Extra),
 		RequestId:   pushRequest.Message.BusinessId,
 		NotifyType:  1,
