@@ -19,7 +19,8 @@ const (
 	deviceTokenMax = 1000
 	deviceTokenMin = 1
 	timeout        = 5
-	clickTypeTwo   = 2
+	clickTypeZero  = 0 // launch App
+	clickTypeTwo   = 2 // open URI page
 	urlPush        = "http://server-api-push.meizu.com/garcia/api/server/push/varnished/pushByPushId"
 )
 
@@ -84,7 +85,7 @@ func (p *PushClient) buildMessage(pushRequest *setting.PushMessageRequest) map[s
 			Content: pushRequest.Message.Content,
 		},
 		ClickTypeInfo: &ClickTypeInfo{
-			ClickType: clickTypeTwo,
+			ClickType: clickTypeZero,
 			Url:       intent.GenerateIntent(p.conf.AppPkgName, pushRequest.Message.Extra),
 		},
 	}
