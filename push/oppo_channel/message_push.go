@@ -17,7 +17,8 @@ import (
 const (
 	deviceTokenMax           = 1000
 	deviceTokenMin           = 1
-	clickActionTypeFive      = 5
+	clickActionTypeZero      = 0 // Launch App
+	clickActionTypeFive      = 5 // Intent scheme URL
 	targetTypeTwo            = 2
 	urlBase                  = "https://api.push.oppomobile.com/server/v1"
 	actionPush               = "message/notification/unicast"
@@ -113,7 +114,7 @@ func (p *PushClient) buildMessage(pushRequest *setting.PushMessageRequest) map[s
 		"title":             pushRequest.Message.Title,
 		"sub_title":         pushRequest.Message.SubTitle,
 		"content":           pushRequest.Message.Content,
-		"click_action_type": strconv.Itoa(clickActionTypeFive),
+		"click_action_type": strconv.Itoa(clickActionTypeZero),
 		"click_action_url":  intent.GenerateIntent(p.conf.AppPkgName, pushRequest.Message.Extra),
 	}
 	if pushRequest.Message.CallBack != "" {
