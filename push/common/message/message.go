@@ -1,8 +1,8 @@
 package message
 
 import (
-	"gitee.com/cristiane/go-push-sdk/push/errcode"
-	"gitee.com/cristiane/go-push-sdk/push/setting"
+	"github.com/curltech/go-push-sdk/push/errcode"
+	"github.com/curltech/go-push-sdk/push/setting"
 )
 
 // 公共消息格式检查

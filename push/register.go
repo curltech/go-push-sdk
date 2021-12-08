@@ -1,18 +1,18 @@
 package push
 
 import (
-	"gitee.com/cristiane/go-push-sdk/push/common/convert"
-	"gitee.com/cristiane/go-push-sdk/push/common/file"
-	"gitee.com/cristiane/go-push-sdk/push/common/json"
-	"gitee.com/cristiane/go-push-sdk/push/errcode"
-	"gitee.com/cristiane/go-push-sdk/push/huawei_channel"
-	"gitee.com/cristiane/go-push-sdk/push/ios_channel/cert_channel"
-	"gitee.com/cristiane/go-push-sdk/push/ios_channel/token_channel"
-	"gitee.com/cristiane/go-push-sdk/push/meizu_channel"
-	"gitee.com/cristiane/go-push-sdk/push/oppo_channel"
-	"gitee.com/cristiane/go-push-sdk/push/setting"
-	"gitee.com/cristiane/go-push-sdk/push/vivo_channel"
-	"gitee.com/cristiane/go-push-sdk/push/xiaomi_channel"
+	"github.com/curltech/go-push-sdk/push/common/convert"
+	"github.com/curltech/go-push-sdk/push/common/file"
+	"github.com/curltech/go-push-sdk/push/common/json"
+	"github.com/curltech/go-push-sdk/push/errcode"
+	"github.com/curltech/go-push-sdk/push/huawei_channel"
+	"github.com/curltech/go-push-sdk/push/ios_channel/cert_channel"
+	"github.com/curltech/go-push-sdk/push/ios_channel/token_channel"
+	"github.com/curltech/go-push-sdk/push/meizu_channel"
+	"github.com/curltech/go-push-sdk/push/oppo_channel"
+	"github.com/curltech/go-push-sdk/push/setting"
+	"github.com/curltech/go-push-sdk/push/vivo_channel"
+	"github.com/curltech/go-push-sdk/push/xiaomi_channel"
 )
 
 const (

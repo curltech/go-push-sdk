@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"gitee.com/cristiane/go-push-sdk/push"
-	"gitee.com/cristiane/go-push-sdk/push/setting"
+	"github.com/curltech/go-push-sdk/push"
+	"github.com/curltech/go-push-sdk/push/setting"
 	"github.com/google/uuid"
 )
 

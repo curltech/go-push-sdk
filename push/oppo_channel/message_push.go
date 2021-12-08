@@ -6,12 +6,12 @@ import (
 	"strconv"
 	"strings"
 
-	"gitee.com/cristiane/go-push-sdk/push/common/http"
-	"gitee.com/cristiane/go-push-sdk/push/common/intent"
-	"gitee.com/cristiane/go-push-sdk/push/common/json"
-	"gitee.com/cristiane/go-push-sdk/push/common/message"
-	"gitee.com/cristiane/go-push-sdk/push/errcode"
-	"gitee.com/cristiane/go-push-sdk/push/setting"
+	"github.com/curltech/go-push-sdk/push/common/http"
+	"github.com/curltech/go-push-sdk/push/common/intent"
+	"github.com/curltech/go-push-sdk/push/common/json"
+	"github.com/curltech/go-push-sdk/push/common/message"
+	"github.com/curltech/go-push-sdk/push/errcode"
+	"github.com/curltech/go-push-sdk/push/setting"
 )
 
 const (

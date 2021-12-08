@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	"gitee.com/cristiane/go-push-sdk/push/common/crypt"
-	"gitee.com/cristiane/go-push-sdk/push/common/http"
-	"gitee.com/cristiane/go-push-sdk/push/errcode"
+	"github.com/curltech/go-push-sdk/push/common/crypt"
+	"github.com/curltech/go-push-sdk/push/common/http"
+	"github.com/curltech/go-push-sdk/push/errcode"
 )
 
 const (

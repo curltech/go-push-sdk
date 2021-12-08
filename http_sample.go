@@ -1,19 +1,19 @@
 package main
 
 import (
-	"gitee.com/cristiane/go-push-sdk/push/huawei_channel"
-	"gitee.com/cristiane/go-push-sdk/push/ios_channel"
-	"gitee.com/cristiane/go-push-sdk/push/meizu_channel"
-	"gitee.com/cristiane/go-push-sdk/push/oppo_channel"
-	"gitee.com/cristiane/go-push-sdk/push/vivo_channel"
-	"gitee.com/cristiane/go-push-sdk/push/xiaomi_channel"
+	"github.com/curltech/go-push-sdk/push/huawei_channel"
+	"github.com/curltech/go-push-sdk/push/ios_channel"
+	"github.com/curltech/go-push-sdk/push/meizu_channel"
+	"github.com/curltech/go-push-sdk/push/oppo_channel"
+	"github.com/curltech/go-push-sdk/push/vivo_channel"
+	"github.com/curltech/go-push-sdk/push/xiaomi_channel"
 	"log"
 	"net/http"
 	"strings"
 
-	"gitee.com/cristiane/go-push-sdk/push"
-	"gitee.com/cristiane/go-push-sdk/push/common/json"
-	"gitee.com/cristiane/go-push-sdk/push/setting"
+	"github.com/curltech/go-push-sdk/push"
+	"github.com/curltech/go-push-sdk/push/common/json"
+	"github.com/curltech/go-push-sdk/push/setting"
 	"github.com/gin-gonic/gin"
 )
 

@@ -3,8 +3,8 @@ package huawei_channel
 import (
 	"context"
 	"encoding/json"
-	"gitee.com/cristiane/go-push-sdk/push/common/http"
-	"gitee.com/cristiane/go-push-sdk/push/errcode"
+	"github.com/curltech/go-push-sdk/push/common/http"
+	"github.com/curltech/go-push-sdk/push/errcode"
 )
 
 const (

@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"gitee.com/cristiane/go-push-sdk/push/common/convert"
-	"gitee.com/cristiane/go-push-sdk/push/common/message"
-	"gitee.com/cristiane/go-push-sdk/push/errcode"
-	"gitee.com/cristiane/go-push-sdk/push/ios_channel"
-	"gitee.com/cristiane/go-push-sdk/push/setting"
+	"github.com/curltech/go-push-sdk/push/common/convert"
+	"github.com/curltech/go-push-sdk/push/common/message"
+	"github.com/curltech/go-push-sdk/push/errcode"
+	"github.com/curltech/go-push-sdk/push/ios_channel"
+	"github.com/curltech/go-push-sdk/push/setting"
 	"github.com/sideshow/apns2"
 	"github.com/sideshow/apns2/certificate"
 )
