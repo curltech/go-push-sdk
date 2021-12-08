@@ -21,6 +21,7 @@ const (
 	timeout             = 5
 	passThroughTypeZero = 0   // 0 表示通知栏消息
 	passThroughTypeOne  = 1   // 1 表示透传消息
+	notifyEffectOne     = "1" // 通知栏点击后打开app的Launcher Activity
 	notifyEffectTwo     = "2" // 通知栏点击后打开app的任一Activity
 	deviceTokenMax      = 100 // 单次最大设备推送量
 	deviceTokenMin      = 1
@@ -91,7 +92,7 @@ func (p *PushClient) buildMessage(pushRequest *setting.PushMessageRequest) map[s
 		"title":                   pushRequest.Message.Title,
 		"description":             pushRequest.Message.Content,
 		"registration_id":         strings.Join(pushRequest.DeviceTokens, ","),
-		"extra.notify_effect":     notifyEffectTwo,
+		"extra.notify_effect":     notifyEffectOne,
 		"extra.intent_uri":        intent.GenerateIntent(p.conf.AppPkgName, pushRequest.Message.Extra),
 	}
 	if pushRequest.Message.CallBack != "" {
